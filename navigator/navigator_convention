@@ -1,0 +1,19 @@
+ switchNavigator ->
+        LOADING_SCREEN
+        LOGIN_SCREEN
+        REGISTER_SCREEN
+        PASSWORDRECOVER_SCREEN
+        LOGGED_SCREEN ->
+            DrawerNavigator ->
+                Screen1 ->
+                  TabNavigator ->
+                      Tab1 -> stackNavigator
+                            screen1 (list)
+                            Screen2 (detail)
+                      Tab2 -> stackNavigator
+                            screen1 (list)
+                            Screen2 (detail)
+                Screen2
+                Screen3
+                screen4
+                screen5
