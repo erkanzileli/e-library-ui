@@ -1,7 +1,6 @@
 import React from 'react'
-import { View } from 'react-native'
+import {View} from 'react-native'
 import Loader from '../../component/Loader'
-import { getToken } from '../../storage';
 
 export default class BookListScreen extends React.Component {
     static navigationOptions = {
@@ -15,21 +14,10 @@ export default class BookListScreen extends React.Component {
         }
     }
 
-    componentDidMount() {
-        
-        // this.setState({ loading: true })
-        // apolloClient.query({
-        //     query: BOOKS
-        // }).then(response => {
-        //     console.log(response)
-        //     this.setState({ loading: false })
-        // }).catch(error => console.log(error))
-    }
-
     render() {
-        const { loading } = this.state
+        const {loading} = this.state
         return <View>
-            <Loader loading={loading} />
+            <Loader loading={loading}/>
         </View>
     }
 }

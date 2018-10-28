@@ -8,4 +8,4 @@ query authors {
       lastName
     }
   }
-  `
+  `;
