@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
-import {Alert, Button, StyleSheet, Text, View} from 'react-native';
+import {Alert, StyleSheet, Text, View} from 'react-native';
 import {NavigationActions} from 'react-navigation';
-import {setToken} from "../storage";
+import { removeToken} from "../storage";
 
 const styles = StyleSheet.create({
     container: {
@@ -36,7 +36,7 @@ class Drawer extends Component {
     };
 
     logout = async () => {
-        await setToken(null);
+        await removeToken();
         await this.props.navigation.dispatch(NavigationActions.navigate({routeName: 'Login'}))
     };
 
