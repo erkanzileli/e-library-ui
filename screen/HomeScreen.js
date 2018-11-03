@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Text, Button, Icon } from 'native-base'
+import React from 'react';
+import { View, Text, Button, Icon } from 'native-base';
 
 export default class HomeScreen extends React.Component {
   static navigationOptions = {

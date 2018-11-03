@@ -41,13 +41,13 @@ export default class LoginScreen extends React.Component {
     handleSubmit = async ({username, password} = this.state) => {
         await this.setState({loading: true});
         await axios({
-            url: 'http://192.168.1.7:8080/login',
+            url: 'http://10.220.101.74:8080/login',
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: {
-                username: 'admin1',
+                username: 'admin',
                 password: '123qweasd'
             }
         }).then(async response => {

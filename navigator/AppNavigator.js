@@ -1,7 +1,7 @@
 import { createSwitchNavigator } from 'react-navigation'
 import LoginScreen from '../screen/LoginScreen'
 import RegisterScreen from '../screen/RegisterScreen'
-import LoadingScreen from '../screen/LoadingScreen'
+import SplashScreen from '../screen/SplashScreen'
 import LoggedNavigator from './LoggedNavigator'
 
 export default createSwitchNavigator(
@@ -15,8 +15,8 @@ export default createSwitchNavigator(
     Logged: {
       screen: LoggedNavigator
     },
-    Loading: {
-      screen: LoadingScreen
+    Splash: {
+      screen: SplashScreen
     }
   },
   {
