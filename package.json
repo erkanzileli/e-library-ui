@@ -24,6 +24,7 @@
     "react-apollo": "^2.2.4",
     "react-final-form": "^3.6.7",
     "react-native": "0.57.4",
+    "react-native-easy-grid": "^0.2.0",
     "react-navigation": "^2.18.2"
   },
   "devDependencies": {

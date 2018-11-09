@@ -1,31 +1,35 @@
-import {createDrawerNavigator} from 'react-navigation'
+import React from 'react'
+import { createBottomTabNavigator } from 'react-navigation'
 import HomeNavigator from './HomeNavigator'
-import SettingsNavigator from './SettingsNavigator'
 import BookNavigator from './BookNavigator'
-import AuthorNavigator from "./AuthorNavigator";
-import Drawer from "../component/Drawer";
+import { Icon } from 'native-base';
 
-export default createDrawerNavigator(
+export default createBottomTabNavigator(
     {
         Home: {
             screen: HomeNavigator,
-            drawerLabel: 'Home'
+            navigationOptions: () => ({
+                title: 'Anasayfa',
+                tabBarIcon: <Icon name='home'/>
+            })
         },
-        Book: {
+        Books: {
             screen: BookNavigator,
-            drawerLabel: 'Book'
-        },
-        Author: {
-            screen: AuthorNavigator,
-            drawerLabel: 'Author'
-        },
-        Settings: {
-            screen: SettingsNavigator,
-            drawerLabel: 'Settings'
+            navigationOptions: () => ({
+                title: 'Kitaplar',
+                tabBarIcon: <Icon name='book'/>
+            })
         }
     },
     {
         initialRouteName: 'Home',
-        contentComponent: Drawer
+        tabBarOptions: {
+            labelStyle: {
+                fontSize: 13
+            },
+            iconStyle: {
+
+            }
+        }
     }
 )

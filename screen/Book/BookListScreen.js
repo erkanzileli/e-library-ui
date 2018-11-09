@@ -1,23 +1,30 @@
 import React from 'react'
-import {View} from 'react-native'
+import { ScrollView } from 'react-native'
+import { View, Toast, Container } from 'native-base'
 import Loader from '../../component/Loader'
+import BookListItem from './BookListItem';
 
 export default class BookListScreen extends React.Component {
     static navigationOptions = {
         title: 'Book'
     }
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            loading: false
-        }
+    state = {
+        loading: false
+    }
+
+    componentDidMount(){
+        Toast.show({
+            text: 'Hello',
+            duration: 1500
+        })
     }
 
     render() {
-        const {loading} = this.state
-        return <View>
-            <Loader loading={loading}/>
-        </View>
+        return <ScrollView>
+            <BookListItem />
+            <BookListItem />
+            <BookListItem />
+        </ScrollView>
     }
 }

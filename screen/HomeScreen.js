@@ -1,21 +1,22 @@
 import React from 'react';
-import { View, Text, Button, Icon } from 'native-base';
+import { View } from 'native-base';
+import { StyleSheet } from 'react-native';
 
-export default class HomeScreen extends React.Component {
+const styles = StyleSheet.create({
+  container: {
+
+  }
+})
+
+class HomeScreen extends React.Component {
   static navigationOptions = {
     title: 'Home'
   }
-
-  renderHamburger = ({ openDrawer } = this.props.navigation) =>
-    <Button onPress={() => openDrawer()}>
-      <Icon name='menu' />
-    </Button>
-
   render() {
-    return <View>
-      <Text onPress={()=>this.props.navigation.navigate('Demo')}>
-        Home
-        </Text>
+    return <View style={styles.container}>
+
     </View>
   }
 }
+
+export default HomeScreen
