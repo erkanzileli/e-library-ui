@@ -1,12 +1,12 @@
 import { createStackNavigator } from 'react-navigation'
-import BookListScreen from '../screen/Book/BookListScreen'
+import BookList from '../component/Book/BookList';
 
 export default createStackNavigator(
   {
     Books: {
-      screen: BookListScreen,
+      screen: BookList,
       navigationOptions: () => ({
-          title: 'Kitaplar',
+        title: 'Kitaplarım',
       })
     }
   },

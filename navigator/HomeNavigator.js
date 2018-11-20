@@ -1,12 +1,12 @@
 import { createStackNavigator } from 'react-navigation'
-import HomeScreen from '../screen/HomeScreen'
+import HomeScreen from '../screen/Home/HomeScreen'
 
 export default createStackNavigator(
   {
     Home: {
       screen: HomeScreen,
       navigationOptions: () => ({
-          title: 'Anasayfa',
+          title: 'Kitaplar',
       })
     }
   },

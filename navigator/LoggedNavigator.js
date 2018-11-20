@@ -1,8 +1,8 @@
 import React from 'react'
 import { createBottomTabNavigator } from 'react-navigation'
 import HomeNavigator from './HomeNavigator'
-import BookNavigator from './BookNavigator'
 import { Icon } from 'native-base';
+import ProfileNavigator from './ProfileNavigator';
 
 export default createBottomTabNavigator(
     {
@@ -10,26 +10,23 @@ export default createBottomTabNavigator(
             screen: HomeNavigator,
             navigationOptions: () => ({
                 title: 'Anasayfa',
-                tabBarIcon: <Icon name='home'/>
+                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='home' />
             })
         },
-        Books: {
-            screen: BookNavigator,
+        Profile: {
+            screen: ProfileNavigator,
             navigationOptions: () => ({
-                title: 'Kitaplar',
-                tabBarIcon: <Icon name='book'/>
+                title: 'Profil',
+                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
             })
         }
     },
     {
         initialRouteName: 'Home',
         tabBarOptions: {
-            labelStyle: {
-                fontSize: 13
-            },
-            iconStyle: {
-
-            }
+            activeTintColor: 'black',
+            inactiveTintColor: 'grey',
+            showLabel: false
         }
     }
 )
