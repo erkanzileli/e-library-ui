@@ -1,5 +1,6 @@
 import React from 'react'
 import { Card, CardItem, Text, Body, Content, View, Icon } from 'native-base';
+import { TouchableOpacity } from 'react-native'
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import StarRating from 'react-native-star-rating';
 
@@ -14,7 +15,7 @@ const styles = {
     }
 }
 
-function BookListItem({ author, description, downloadCount, likeCount, name }) {
+export default function BookListItem({ author, description, downloadCount, likeCount, name, saved }) {
     return <View>
         <Content>
             <Card>
@@ -57,7 +58,9 @@ function BookListItem({ author, description, downloadCount, likeCount, name }) {
                                 <Text style={styles.downloadCountText}> {downloadCount} </Text>
                             </Col>
                             <Col style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                <Icon type='MaterialIcons' name='bookmark-border' />
+                                <TouchableOpacity>
+                                    <Icon type='MaterialIcons' name={saved ? 'bookmark-border' : 'bookmark'} />
+                                </TouchableOpacity>
                             </Col>
                         </Row>
                     </Grid>
@@ -67,4 +70,3 @@ function BookListItem({ author, description, downloadCount, likeCount, name }) {
     </View>
 }
 
-export default BookListItem
