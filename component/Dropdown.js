@@ -1,9 +1,9 @@
 import React from 'react'
-import { Item, Picker, Icon, Label } from 'native-base'
+import { Item, Picker } from 'native-base'
 import PropTypes from 'prop-types'
 
 class Dropdown extends React.Component {
-  constructor(props){
+  constructor(props) {
     super(props)
     this.state = {
       value: this.props.value
@@ -16,12 +16,11 @@ class Dropdown extends React.Component {
     })
     await this.props.onChange(value)
   }
-  
-  render () {
+
+  render() {
     const { options, label } = this.props
-    const {value} = this.state
+    const { value } = this.state
     return <Item picker>
-      <Label>SA</Label>
       <Picker
         mode='dropdown'
         onValueChange={this.handleChanged}
@@ -48,7 +47,7 @@ Dropdown.propTypes = {
 
 Dropdown.defaultProps = {
   value: undefined,
-  onChange: () => {}
+  onChange: () => { }
 }
 
 export default Dropdown

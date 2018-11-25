@@ -5,7 +5,9 @@ import {
     View,
     Image
 } from 'react-native';
-import { Container, Header, Tabs, Tab, TabHeading, Icon, ScrollableTab } from 'native-base';
+import { Container, Tabs, Tab, TabHeading, Icon } from 'native-base';
+import DownloadedBooksTab from './Tabs/DownloadedBooks/DownloadedBooksTab';
+import SavedBooksTab from './Tabs/SavedBooks/SavedBooksTab';
 
 export default class ProfileScreen extends React.Component {
     render() {
@@ -15,19 +17,18 @@ export default class ProfileScreen extends React.Component {
                     <View style={styles.headerContent}>
                         <Image style={styles.avatar}
                             source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
-
                         <Text style={styles.name}>
-                            Erkan ZİLELİ
+                            John Doe
                     </Text>
                     </View>
                 </View>
                 <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
                     <Tabs>
                         <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
-                            {/* <Tab2 /> */}
+                            <DownloadedBooksTab />
                         </Tab>
                         <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
-                            {/* <Tab2 /> */}
+                            <SavedBooksTab />
                         </Tab>
                     </Tabs>
                 </View>

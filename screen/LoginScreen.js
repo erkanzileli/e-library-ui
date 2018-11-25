@@ -1,47 +1,25 @@
-import React from "react";
+import React, { Component } from 'react';
 import {
-    Alert,
-    Keyboard,
-    KeyboardAvoidingView,
-    SafeAreaView,
-    StatusBar,
     StyleSheet,
     Text,
+    View,
     TextInput,
-    TouchableOpacity,
-    TouchableWithoutFeedback,
-    View
-} from "react-native";
+    TouchableOpacity
+} from 'react-native';
 import axios from 'axios'
 
 import Loader from "../component/Loader.js";
-import {setToken} from "../storage/index.js";
+import { setToken } from "../storage/index.js";
 
-const options = [
-    {
-        label: "Açık",
-        value: true
-    },
-    {
-        label: "Kapalı",
-        value: false
-    }
-];
-
-export default class LoginScreen extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: "",
-            password: "",
-            loading: false
-        };
+export default class LoginScreen extends Component {
+    state = {
+        loading: false
     }
 
-    handleSubmit = async ({username, password} = this.state) => {
-        await this.setState({loading: true});
+    handleSubmit = async ({ username, password } = this.state) => {
+        await this.setState({ loading: true });
         await axios({
-            url: 'http://192.168.43.181:8080/login',
+            url: 'http://10.37.138.22:8080/login',
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
@@ -51,79 +29,55 @@ export default class LoginScreen extends React.Component {
                 password: '123qweasd'
             }
         }).then(async response => {
-            const {data} = response;
+            const { data } = response;
             await setToken(data.token);
             await this.props.navigation.navigate('Logged')
         }).catch(async error => {
-            const {response: {status}} = error;
+            const { response: { status } } = error;
             if (status === 401) {
                 Alert.alert(
                     'Hata',
                     'Kullanıcı adı veya şifre yanlış',
                     [],
-                    {cancelable: true}
+                    { cancelable: true }
                 )
             } else {
                 console.warn(error)
             }
         });
-        this.setState({loading: false})
+        this.setState({ loading: false })
     };
 
     render() {
-        const {navigate} = this.props.navigation;
-        const {username, password, loading} = this.state;
+        const { loading } = this.state
         return (
-            <SafeAreaView style={styles.container}>
-                <Loader loading={loading}/>
-                <StatusBar barStyle="light-content"/>
-                <KeyboardAvoidingView behavior="padding" style={styles.container}>
-                    <TouchableWithoutFeedback
-                        style={styles.container}
-                        onPress={Keyboard.dismiss}
-                    >
-                        <View style={styles.logoContainer}>
-                            <Text style={styles.logo}>L O G O</Text>
-                            <Text style={styles.infoText}>Hesap Bilgileri</Text>
-                            <View style={styles.inputContainer}>
-                                <TextInput
-                                    onChangeText={value => this.setState({username: value})}
-                                    style={styles.input}
-                                    value={username}
-                                    placeholder="Kullanıcı Adı Giriniz! "
-                                    placeholderTextColor="white"
-                                    keyboardType="email-address"
-                                    returnKeyType="next"
-                                    underlineColorAndroid="rgba(255,255,255,0)"
-                                    autoCorrect={false}
-                                    autoFocus={false}
-                                    onSubmitEditing={() => this.refs.txtPass.focus()}
-                                />
+            <View style={styles.container}>
+                <Loader loading={loading} />
+                <Text style={{ fontSize: 20, paddingBottom: 20 }}>
+                    Giriş Yapın
+                </Text>
 
-                                <TextInput
-                                    onChangeText={value => this.setState({password: value})}
-                                    style={styles.input}
-                                    value={password}
-                                    placeholder="Parola Giriniz! "
-                                    placeholderTextColor="white"
-                                    secureTextEntry
-                                    returnKeyType="go"
-                                    underlineColorAndroid="rgba(255,255,255,0)"
-                                    autoCorrect={false}
-                                    autoFocus={false}
-                                    ref={"txtPass"}
-                                />
-                                <TouchableOpacity
-                                    onPress={() => this.handleSubmit()}
-                                    style={styles.btnContainer}
-                                >
-                                    <Text style={styles.btnText}>GİRİS YAP</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                    </TouchableWithoutFeedback>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
+                <View style={styles.inputContainer}>
+                    <TextInput style={styles.inputs}
+                        placeholder="Kullanıcı Adı"
+                        underlineColorAndroid='transparent' />
+                </View>
+                <View style={styles.inputContainer}>
+                    <TextInput style={styles.inputs}
+                        placeholder="Şifre"
+                        secureTextEntry
+                        underlineColorAndroid='transparent' />
+                </View>
+                <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]}
+                    onPress={() => this.handleSubmit()}
+                >
+                    <Text style={styles.loginText}>Giriş Yap</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => this.props.navigation.navigate('Register')}>
+                    <Text>Hesabım Yok</Text>
+                </TouchableOpacity>
+            </View>
         );
     }
 }
@@ -131,55 +85,46 @@ export default class LoginScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "rgb(32, 53, 70)",
-        justifyContent: "center"
-    },
-    logoContainer: {
-        alignItems: "center",
-        justifyContent: "center",
-        flex: 1
-    },
-    logo: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 28
-    },
-    infoText: {
-        color: "yellow",
-        fontSize: 14,
-        marginTop: 5,
-        marginBottom: 25,
-        textAlign: "center",
-        opacity: 0.6
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#DCDCDC',
     },
     inputContainer: {
-        position: "absolute",
-        left: 0,
-        right: 0,
-        bottom: 0,
-        height: 200,
-        padding: 20
-    },
-    input: {
-        borderColor: "white",
-        color: "white",
-        borderWidth: 2,
-        borderRadius: 10,
-        height: 40,
-        margin: 5,
-        backgroundColor: "rgba(255,255,255,0.2)",
-        paddingHorizontal: 10
-    },
-    btnContainer: {
+        borderBottomColor: '#F5FCFF',
+        backgroundColor: '#FFFFFF',
         borderRadius: 30,
-        marginHorizontal: 10,
-        margin: 10,
-        paddingVertical: 15,
-        backgroundColor: "#f7c744"
+        borderBottomWidth: 1,
+        width: 250,
+        height: 45,
+        marginBottom: 20,
+        flexDirection: 'row',
+        alignItems: 'center'
     },
-    btnText: {
-        textAlign: "center",
-        fontSize: 18,
-        fontWeight: "bold"
+    inputs: {
+        height: 45,
+        marginLeft: 16,
+        borderBottomColor: '#FFFFFF',
+        flex: 1,
+    },
+    inputIcon: {
+        width: 30,
+        height: 30,
+        marginLeft: 15,
+        justifyContent: 'center'
+    },
+    buttonContainer: {
+        height: 45,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        width: 250,
+        borderRadius: 30,
+    },
+    loginButton: {
+        backgroundColor: "#00b5ec",
+    },
+    loginText: {
+        color: 'white',
     }
 });

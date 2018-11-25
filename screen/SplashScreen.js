@@ -12,7 +12,7 @@ export default class SplashScreen extends React.Component {
     const token = await getToken();
     if (token) {
       // forward to HomeScreen
-      this.props.navigation.navigate('Home')
+      this.props.navigation.navigate('Management')
     } else {
       // forward to LoginScreen
       this.props.navigation.navigate('Login')

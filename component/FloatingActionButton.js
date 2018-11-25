@@ -3,7 +3,7 @@ import { Icon } from 'native-base';
 import { TouchableOpacity } from 'react-native';
 import PropTypes from 'prop-types'
 
-function FloatingActionButton({ onPress }) {
+function FloatingActionButton({ icon, onPress }) {
     return <TouchableOpacity
         style={{
             borderWidth: 1,
@@ -20,7 +20,7 @@ function FloatingActionButton({ onPress }) {
         }}
         onPress={() => onPress()}
     >
-        <Icon name="settings" color="#01a699" />
+        {icon}
     </TouchableOpacity>
 }
 
