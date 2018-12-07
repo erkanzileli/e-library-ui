@@ -10,7 +10,7 @@ class HomeScreen extends React.Component {
   render() {
     return (
       <Container style={{backgroundColor: '#efefef'}}>
-        <BookList />
+        <BookList navigation={this.props.navigation} />
       </Container>
     )
   }

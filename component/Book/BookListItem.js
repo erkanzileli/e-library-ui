@@ -15,7 +15,8 @@ const styles = {
     }
 }
 
-export default function BookListItem({ author, description, downloadCount, likeCount, name, saved }) {
+export default function BookListItem(props) {
+    const { author, description,title, downloadCount, likeCount, name, saved, navigation } = props
     return <View>
         <Content>
             <Card>
@@ -23,7 +24,9 @@ export default function BookListItem({ author, description, downloadCount, likeC
                     <Grid>
                         <Row>
                             <Col size={5}>
-                                <Text style={{ fontSize: 20 }} >{name}</Text>
+                                <TouchableOpacity onPress={() => navigation.navigate('BookDetail', props)}>
+                                    <Text style={{ fontSize: 20 }} >{name}</Text>
+                                </TouchableOpacity>
                             </Col>
                             <Col size={3}>
                                 <StarRating
@@ -46,7 +49,7 @@ export default function BookListItem({ author, description, downloadCount, likeC
                 <CardItem bordered>
                     <Body>
                         <Text>
-                            {description}
+                            {title}
                         </Text>
                     </Body>
                 </CardItem>

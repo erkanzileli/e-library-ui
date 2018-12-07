@@ -20,8 +20,8 @@ export default class ManagementScreen extends React.Component {
       },
       {
         id: 2,
-        firstName: 'Azra',
-        lastName: 'Kohen',
+        firstName: 'Tom',
+        lastName: 'Swiss',
         role: 'editor'
       },
       {

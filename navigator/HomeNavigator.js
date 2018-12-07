@@ -1,5 +1,6 @@
 import { createStackNavigator } from 'react-navigation'
 import HomeScreen from '../screen/Home/HomeScreen'
+import BookDetailScreen from '../screen/BookDetailScreen';
 
 export default createStackNavigator(
   {
@@ -8,6 +9,9 @@ export default createStackNavigator(
       navigationOptions: () => ({
           title: 'Kitaplar',
       })
+    },
+    BookDetail: {
+      screen: BookDetailScreen
     }
   },
   {

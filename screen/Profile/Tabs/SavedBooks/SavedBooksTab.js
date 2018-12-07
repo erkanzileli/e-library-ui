@@ -7,14 +7,6 @@ export default class SavedBooksTab extends React.Component {
 
     bookData = [
         {
-            id: 1,
-            name: 'Fi',
-            author: {
-                firstName: 'Azra',
-                lastName: 'Kohen'
-            }
-        },
-        {
             id: 2,
             name: 'Çi',
             author: {

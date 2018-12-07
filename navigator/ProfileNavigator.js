@@ -1,10 +1,10 @@
 import { createStackNavigator } from 'react-navigation'
-import ProfileScreen from '../screen/Profile/ProfileHomeScreen';
+import ProfileHomeScreen from '../screen/Profile/ProfileHomeScreen';
 
 export default createStackNavigator(
     {
         ProfileHome: {
-            screen: ProfileScreen,
+            screen: ProfileHomeScreen,
             navigationOptions: () => ({
                 title: 'Profil',
             })

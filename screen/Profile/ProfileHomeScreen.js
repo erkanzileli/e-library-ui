@@ -8,11 +8,28 @@ import {
 import { Container, Tabs, Tab, TabHeading, Icon } from 'native-base';
 import DownloadedBooksTab from './Tabs/DownloadedBooks/DownloadedBooksTab';
 import SavedBooksTab from './Tabs/SavedBooks/SavedBooksTab';
+import FloatingActionButton from '../../component/FloatingActionButton';
 
-export default class ProfileScreen extends React.Component {
+export default class ProfileHomeScreen extends React.Component {
+    state = {
+        updateScreenActive: false
+    }
     render() {
+        const { updateScreenActive } = this.state
+        const tabs = (
+            <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
+                <Tabs>
+                    <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
+                        <DownloadedBooksTab />
+                    </Tab>
+                    <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
+                        <SavedBooksTab />
+                    </Tab>
+                </Tabs>
+            </View>)
         return (
             <Container style={styles.container}>
+                <FloatingActionButton onPress={() => this.setState({ updateScreenActive: !updateScreenActive })} style={{ zIndex: 1 }} icon={<Icon name='settings' />} />
                 <View style={{ justifyContent: 'center', alignContent: 'center', backgroundColor: '#66b7d6' }}>
                     <View style={styles.headerContent}>
                         <Image style={styles.avatar}
@@ -22,16 +39,9 @@ export default class ProfileScreen extends React.Component {
                     </Text>
                     </View>
                 </View>
-                <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
-                    <Tabs>
-                        <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
-                            <DownloadedBooksTab />
-                        </Tab>
-                        <Tab heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
-                            <SavedBooksTab />
-                        </Tab>
-                    </Tabs>
-                </View>
+                {
+                    updateScreenActive ? undefined : tabs
+                }
             </Container>
         );
     }
