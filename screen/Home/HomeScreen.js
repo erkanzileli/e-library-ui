@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Icon } from 'native-base';
-import { FlatList } from "react-native";
+import { FlatList, RefreshControl } from "react-native";
 import FloatingActionButton from '../../component/FloatingActionButton';
 import { GET_BOOKS } from '../../utils/gql';
 import apolloClient from '../../utils/apolloClient';
@@ -8,24 +8,29 @@ import BookListItem from '../../component/Book/BookListItem';
 
 class HomeScreen extends React.Component {
   state = {
-    books: []
+    books: [],
+    refreshing: false
   }
 
-  constructor(props) {
-    super(props)
-    console.warn(props)
+  componentDidMount(props) {
+    this.fetchData()
   }
 
-  async componentDidMount(props) {
+  fetchData = async () => {
     let { data: { books } } = await apolloClient.query({ query: GET_BOOKS, fetchPolicy: 'no-cache' })
-    this.setState({ books })
+    this.setState({ books, refreshing: false })
+  }
+
+  _onRefresh = () => {
+    this.setState({ refreshing: true });
+    this.fetchData()
   }
 
   render() {
     const { navigation } = this.props
     const { books } = this.state
     if (navigation.state.params && navigation.state.params.bookId) {
-      navigation.navigate({ routeName: 'BookDetail', params: { ...navigation.params } })
+      navigation.navigate({ routeName: 'BookDetail', params: { bookId: navigation.state.params.bookId } })
     }
     return (
       <Container style={{ backgroundColor: '#efefef' }}>
@@ -35,6 +40,12 @@ class HomeScreen extends React.Component {
           icon={<Icon name='add' />}
         />
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
           data={books}
           renderItem={({ item }) => (<BookListItem navigation={navigation} {...item} />)}
           keyExtractor={(item, index) => item.id.toString()}

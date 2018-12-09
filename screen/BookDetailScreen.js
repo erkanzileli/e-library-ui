@@ -4,6 +4,7 @@ import { TouchableOpacity } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import apolloClient from '../utils/apolloClient';
 import { GET_BOOK } from '../utils/gql';
+import Loader from '../component/Loader';
 
 const styles = {
     authorText: {
@@ -21,6 +22,7 @@ class BookDetailScreen extends React.Component {
     });
 
     state = {
+        loading: true,
         book: {
             name: null,
             title: null,
@@ -39,17 +41,22 @@ class BookDetailScreen extends React.Component {
         }
     }
 
-    async componentDidMount(props) {
-        console.warn(props)
-        const { bookId } = props.id
-        let { data: { book } } = await apolloClient.query({ query: GET_BOOK, variables: { id: bookId } })
-        this.setState({ book })
+    constructor(props) {
+        super(props)
+        const { bookId } = props.navigation.state.params
+        this.getBook(bookId)
     }
-    
+
+    getBook = async bookId => {
+        const { data: { book } } = await apolloClient.query({ query: GET_BOOK, variables: { id: bookId }, fetchPolicy: 'no-cache' })
+        this.setState({ book, loading: false })
+    }
+
     render() {
         const { navigation } = this.props
         const { name, title, description, pageCount, downloadCount, likeCount, author, category, user } = this.state.book
         return <Container>
+            <Loader loading={this.state.loading} />
             <Header>
                 <Left>
                     <Button transparent onPress={() => navigation.goBack()}>
