@@ -1,8 +1,9 @@
 import React from 'react'
-import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View } from 'native-base';
+import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container } from 'native-base';
 import { Form } from 'react-final-form';
 import apolloClient from '../../utils/apolloClient';
 import Loader from '../../component/Loader';
+import { UPDATE_USER } from '../../utils/gql';
 
 function validations(values) {
     let result = {
@@ -37,38 +38,41 @@ function validations(values) {
 
 export class EditProfileScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
-        header: <Header>
-            <Left>
-                <Button transparent onPress={() => navigation.goBack()}>
-                    <Icon name='arrow-back' />
-                </Button>
-            </Left>
-            <Body>
-                <Title>Profil Düzenleme</Title>
-            </Body>
-            <Right>
-                <Button transparent onPress={() => { }}>
-                    <Icon type='MaterialIcons' name='save' />
-                </Button>
-            </Right>
-        </Header>
+        header: <></>
     });
 
     constructor(props) {
         super(props)
         this.state = {
             loading: false,
-            firstName: props.firstName,
-            lastName: props.lastName,
-            email: props.email
+            ...props.navigation.state.params.user
         }
-
     }
 
-    handleSubmit = ({ firstName, lastName, email } = this.state, { id } = this.props) => {
-        this.setState({ loading: true })
+    handleSubmit = ({ firstName, lastName, email } = this.state) => {
+        const validate=validations({firstName,lastName,email})
+        let valid = true
+        Object.keys(validate).forEach(key => {
+            if (!validate[key]) {
+                valid = false
+            }
+        })
+        if (!valid) {
+            Toast.show({
+                text: "Alanların doğruluğunu kontrol edin veya boş bırakmayın!",
+                buttonText: "Tamam",
+                duration: 3000,
+                type: 'danger'
+            })
+        } else {
+            this.submit()
+        }
+    }
+
+        submit =({id, firstName, lastName, email} = this.state) => {
+            this.setState({ loading: true })
         apolloClient.mutate({
-            mutation: undefined,
+            mutation: UPDATE_USER,
             variables: { id, firstName, lastName, email }
         }).then(response => {
 
@@ -78,13 +82,31 @@ export class EditProfileScreen extends React.Component {
                 duration: 3000
             })
             this.setState({ loading: false })
+            this.props.navigation.navigate({ routeName: 'ProfileHome', params: { userId: response.data.updateUser.id, refresh: true} })
         })
     }
 
+
     render() {
         const { firstName, lastName, email, loading } = this.state
+        const {navigation} = this.props
         const validate = validations({ firstName, lastName, email })
-        return <View>
+        return <Container>
+            <Header>
+            <Left>
+                <Button transparent onPress={() => navigation.goBack()}>
+                    <Icon name='arrow-back' />
+                </Button>
+            </Left>
+            <Body>
+                <Title>Profil Düzenleme</Title>
+            </Body>
+            <Right>
+                <Button transparent onPress={() => this.handleSubmit()}>
+                    <Icon type='MaterialIcons' name='save' />
+                </Button>
+            </Right>
+        </Header>
             <Loader loading={loading} />
             <View style={{ padding: 10 }}>
                 <Form
@@ -118,6 +140,6 @@ export class EditProfileScreen extends React.Component {
                     </>)}
                 />
             </View>
-        </View>
+        </Container>
     }
 }

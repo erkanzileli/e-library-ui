@@ -18,6 +18,17 @@ query bookCategories {
     }
   }`
 
+export const UPDATE_USER = gql`
+mutation updateUser($id: Long!, $firstName: String!, $lastName:String!, $email:String!){
+  updateUser(id: $id, firstName:$firstName, lastName: $lastName, email: $email){
+    id
+    firstName
+    lastName
+    email
+  }
+}
+`
+
 export const CREATE_BOOK = gql`
 mutation createBook(
     $name:String!
@@ -98,6 +109,17 @@ query book($id:Long!){
     }
   }
   `
+
+export const GET_USER = gql`
+  query user($id: Long!){
+    user(id: $id){
+      id
+      firstName
+      lastName
+      email
+    }
+  }
+`
 
 export const GET_BOOKS = gql`
 query books{
