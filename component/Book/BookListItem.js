@@ -23,7 +23,7 @@ export default function BookListItem(props) {
                 <Grid>
                     <Row>
                         <Col size={5}>
-                            <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { ...props })}>
+                            <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { bookId: props.id })}>
                                 <Text style={{ fontSize: 20 }}>{name}</Text>
                             </TouchableOpacity>
                         </Col>

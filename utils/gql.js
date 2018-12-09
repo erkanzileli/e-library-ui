@@ -77,7 +77,7 @@ mutation createBook(
   }
   `
 export const GET_BOOK = gql`
-query book($id:Long!){
+query book($id: Long!){
     book(id: $id) {
       id
       name
