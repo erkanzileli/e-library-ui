@@ -5,7 +5,6 @@ import PropTypes from 'prop-types'
 function FloatingActionButton({ icon, onPress, style }) {
     return <TouchableOpacity
         style={{
-            ...style, 
             borderWidth: 1,
             borderColor: 'rgba(0,0,0,0.2)',
             alignItems: 'center',
@@ -17,6 +16,7 @@ function FloatingActionButton({ icon, onPress, style }) {
             left: 350,
             backgroundColor: '#fff',
             borderRadius: 100,
+            ...style
         }}
         onPress={() => onPress()}
     >

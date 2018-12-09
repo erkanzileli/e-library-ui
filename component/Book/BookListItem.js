@@ -16,60 +16,58 @@ const styles = {
 }
 
 export default function BookListItem(props) {
-    const { author, description,title, downloadCount, likeCount, name, saved, navigation } = props
-    return <View>
-        <Content>
-            <Card>
-                <CardItem header bordered>
-                    <Grid>
-                        <Row>
-                            <Col size={5}>
-                                <TouchableOpacity onPress={() => navigation.navigate('BookDetail', props)}>
-                                    <Text style={{ fontSize: 20 }} >{name}</Text>
-                                </TouchableOpacity>
-                            </Col>
-                            <Col size={3}>
-                                <StarRating
-                                    disabled
-                                    maxStars={5}
-                                    starSize={20}
-                                    rating={5 * parseFloat(likeCount / downloadCount)}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <Text style={styles.authorText}>
-                                    {`${author.firstName} ${author.lastName}`}
-                                </Text>
-                            </Col>
-                        </Row>
-                    </Grid>
-                </CardItem>
-                <CardItem bordered>
-                    <Body>
-                        <Text>
-                            {title}
-                        </Text>
-                    </Body>
-                </CardItem>
-                <CardItem footer bordered>
-                    <Grid>
-                        <Row>
-                            <Col style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
-                                <Icon name='download' />
-                                <Text style={styles.downloadCountText}> {downloadCount} </Text>
-                            </Col>
-                            <Col style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
-                                <TouchableOpacity>
-                                    <Icon type='MaterialIcons' name={saved ? 'bookmark-border' : 'bookmark'} />
-                                </TouchableOpacity>
-                            </Col>
-                        </Row>
-                    </Grid>
-                </CardItem>
-            </Card>
-        </Content>
-    </View>
+    const { author, description, title, downloadCount, likeCount, name, saved, navigation } = props
+    return <Content style={{ flex: 1 }}>
+        <Card>
+            <CardItem header bordered>
+                <Grid>
+                    <Row>
+                        <Col size={5}>
+                            <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { ...props })}>
+                                <Text style={{ fontSize: 20 }}>{name}</Text>
+                            </TouchableOpacity>
+                        </Col>
+                        <Col size={3}>
+                            <StarRating
+                                disabled
+                                maxStars={5}
+                                starSize={20}
+                                rating={5 * parseFloat(likeCount / downloadCount)}
+                            />
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Text style={styles.authorText}>
+                                {`${author.firstName} ${author.lastName}`}
+                            </Text>
+                        </Col>
+                    </Row>
+                </Grid>
+            </CardItem>
+            <CardItem bordered>
+                <Body>
+                    <Text>
+                        {title}
+                    </Text>
+                </Body>
+            </CardItem>
+            <CardItem footer bordered>
+                <Grid>
+                    <Row>
+                        <Col style={{ flexDirection: 'row', justifyContent: 'flex-start' }}>
+                            <Icon name='download' />
+                            <Text style={styles.downloadCountText}> {downloadCount} </Text>
+                        </Col>
+                        <Col style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <TouchableOpacity>
+                                <Icon type='MaterialIcons' name={saved ? 'bookmark-border' : 'bookmark'} />
+                            </TouchableOpacity>
+                        </Col>
+                    </Row>
+                </Grid>
+            </CardItem>
+        </Card>
+    </Content>
 }
 

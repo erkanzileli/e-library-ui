@@ -4,7 +4,8 @@ import {
     Text,
     View,
     TextInput,
-    TouchableOpacity
+    TouchableOpacity,
+    Alert
 } from 'react-native';
 import axios from 'axios'
 
@@ -19,13 +20,13 @@ export default class LoginScreen extends Component {
     handleSubmit = async ({ username, password } = this.state) => {
         await this.setState({ loading: true });
         await axios({
-            url: 'http://192.168.1.4:8080/login',
+            url: 'http://192.168.43.181:8080/login',
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: {
-                username: 'adminn',
+                username: 'admin',
                 password: '123qweasd'
             }
         }).then(async response => {

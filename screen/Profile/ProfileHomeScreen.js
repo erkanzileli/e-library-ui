@@ -3,8 +3,7 @@ import {
     StyleSheet,
     Text,
     View,
-    Image,
-    KeyboardAvoidingView
+    Image
 } from 'react-native';
 import { Container, Tabs, Tab, TabHeading, Icon } from 'native-base';
 import DownloadedBooksTab from './Tabs/DownloadedBooks/DownloadedBooksTab';
@@ -38,7 +37,6 @@ export default function ProfileHomeScreen(props) {
             </View>
         </Container>
     );
-
 }
 const styles = StyleSheet.create({
     header: {

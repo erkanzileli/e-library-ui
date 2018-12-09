@@ -1,5 +1,5 @@
 import React from 'react'
-import { Item, Picker } from 'native-base'
+import { Item, Picker, Label } from 'native-base'
 import PropTypes from 'prop-types'
 
 class Dropdown extends React.Component {
@@ -21,6 +21,7 @@ class Dropdown extends React.Component {
     const { options, label } = this.props
     const { value } = this.state
     return <Item picker>
+      <Label> {label} </Label>
       <Picker
         mode='dropdown'
         onValueChange={this.handleChanged}
