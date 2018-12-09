@@ -11,41 +11,35 @@ import DownloadedBooksTab from './Tabs/DownloadedBooks/DownloadedBooksTab';
 import SavedBooksTab from './Tabs/SavedBooks/SavedBooksTab';
 import FloatingActionButton from '../../component/FloatingActionButton';
 
-export default class ProfileHomeScreen extends React.Component {
-    state = {
-        updateScreenActive: false
-    }
-    render() {
-        const { updateScreenActive } = this.state
-        return (
-            <Container style={{ flex: 1 }}>
-                <FloatingActionButton onPress={() => this.props.navigation.navigate('ProfileEdit')} style={{ zIndex: 1 }} icon={<Icon name='settings' />} />
-                <View style={{ justifyContent: 'center', alignContent: 'center', backgroundColor: '#66b7d6' }}>
-                    <View style={styles.headerContent}>
-                        <Image style={styles.avatar}
-                            source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
-                        <Text style={styles.name}>
-                            John Doe
-                    </Text>
-                    </View>
+export default function ProfileHomeScreen(props) {
+    return (
+        <Container>
+            <FloatingActionButton onPress={() => props.navigation.navigate('ProfileEdit')} style={{ zIndex: 1 }} icon={<Icon name='settings' />} />
+            <View style={{ justifyContent: 'center', alignContent: 'center', backgroundColor: '#66b7d6' }}>
+                <View style={styles.headerContent}>
+                    <Image style={styles.avatar}
+                        source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
+                    <Text style={styles.name}>
+                        John Doe
+                </Text>
                 </View>
-                <View>
-                    <View style={{ flex: 0, justifyContent: 'space-evenly', alignContent: 'center' }}>
-                        <Tabs style={{ flex: 0 }}>
-                            <Tab heading={<TabHeading style={{ flex: 1, backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
-                                <DownloadedBooksTab />
-                            </Tab>
-                            <Tab heading={<TabHeading style={{ flex: 1, backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
-                                <SavedBooksTab />
-                            </Tab>
-                        </Tabs>
-                    </View>
+            </View>
+            <View style={{ flex: 1 }}>
+                <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
+                    <Tabs style={{ flex: 1 }}>
+                        <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
+                            <DownloadedBooksTab />
+                        </Tab>
+                        <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
+                            <SavedBooksTab />
+                        </Tab>
+                    </Tabs>
                 </View>
-            </Container>
-        );
-    }
-}
+            </View>
+        </Container>
+    );
 
+}
 const styles = StyleSheet.create({
     header: {
         backgroundColor: "#1E90FF",
