@@ -35,17 +35,16 @@ mutation createBook(
     $title: String!
     $description: String!
     $pageCount:Int!
-    $userId:Long!
+    $username:String!
     $authorId:Long!
     $categoryId: Long!
-  
   ) {
     createBook(
       name: $name
       title: $title
       description: $description
       pageCount: $pageCount
-      userId: $userId
+      username: $username
       authorId: $authorId
         categoryId: $categoryId
     ) {
@@ -111,13 +110,28 @@ query book($id: Long!){
   `
 
 export const GET_USER = gql`
-  query user($id: Long!){
-    user(id: $id){
+  query user($username: String!){
+    user(username: $username){
       id
       firstName
       lastName
+      username
       email
+      isRequested
+      type
     }
+  }
+`
+
+export const DELETE_BOOK = gql `
+mutation deleteBook($id:Long!, $token: String!){
+  deleteBook(id: $id, token: $token)
+}
+`
+
+export const REQUEST_USER = gql`
+  mutation requestUser($username: String!){
+    requestUser(username: $username)
   }
 `
 

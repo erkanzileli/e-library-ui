@@ -4,7 +4,6 @@ import apolloClient from '../../../utils/apolloClient';
 import Loader from '../../../component/Loader';
 import Dropdown from '../../../component/Dropdown';
 import { AUTHORS, BOOK_CATEGORIES, CREATE_BOOK } from '../../../utils/gql';
-import { getUserName } from '../../../utils/authorization';
 
 function validations(values) {
     let result = {
@@ -48,7 +47,7 @@ function validations(values) {
     return result
 }
 
-export class BookCreateScreen extends React.Component {
+export class BookEditScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         header: <></>
     });
@@ -66,8 +65,6 @@ export class BookCreateScreen extends React.Component {
             userId: 1,
             authors: [],
             bookCategories: [],
-            authorOptions:[],
-            bookCategoryOptions: [],
             validation: {
                 name: true,
                 title: true,
@@ -82,12 +79,7 @@ export class BookCreateScreen extends React.Component {
     async componentDidMount(props) {
         let { data: { authors } } = await apolloClient.query({ query: AUTHORS, fetchPolicy: 'no-cache' })
         let { data: { bookCategories } } = await apolloClient.query({ query: BOOK_CATEGORIES, fetchPolicy: 'no-cache' })
-        const authorOptions = authors.map(author => ({ value: author.id, label: `${author.firstName} ${author.lastName}` }))
-        const bookCategoryOptions = bookCategories.map(category => ({ value: category.id, label: category.name }))
-        this.setState({ authors, bookCategories, authorOptions, bookCategoryOptions, 
-            authorId: authorOptions.length > 0 ? authorOptions[0].value : null,
-            categoryId: bookCategoryOptions.length > 0 ? bookCategoryOptions[0].value : null
-         })
+        this.setState({ authors, bookCategories })
     }
 
     handleSubmit = ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
@@ -110,12 +102,11 @@ export class BookCreateScreen extends React.Component {
         }
     }
 
-    submit = async ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
+    submit = ({ name, title, description, pageCount, authorId, userId, categoryId } = this.state) => {
         this.setState({ loading: true })
-        const username = await getUserName()
         apolloClient.mutate({
             mutation: CREATE_BOOK,
-            variables: { name, title, description, pageCount, authorId, username, categoryId }
+            variables: { name, title, description, pageCount, authorId, userId, categoryId }
         }).then(response => {
             Toast.show({
                 text: "Kaydedildi!",
@@ -127,9 +118,12 @@ export class BookCreateScreen extends React.Component {
         })
     }
 
+
     render() {
-        const { name, title, description, pageCount, loading, authorOptions, authorId, categoryId, bookCategoryOptions } = this.state
+        const { name, title, description, pageCount, loading, categoryId, authorId, authors, bookCategories } = this.state
         const { navigation } = this.props
+        const authorOptions = authors.map(author => ({ value: author.id, label: `${author.firstName} ${author.lastName}` }))
+        const bookCategoryOptions = bookCategories.map(category => ({ value: category.id, label: category.name }))
         const validate = validations({ name, title, description })
         return <Container>
             <Header>
@@ -167,7 +161,6 @@ export class BookCreateScreen extends React.Component {
                         />
                     </Item>
                     <Dropdown
-                        value={categoryId}
                         label='Kategori'
                         options={bookCategoryOptions}
                         onChange={value => this.setState({ categoryId: value })}
@@ -189,7 +182,6 @@ export class BookCreateScreen extends React.Component {
                         />
                     </Item>
                     <Dropdown
-                        value={authorId}
                         label='Yazar'
                         options={authorOptions}
                         onChange={value => this.setState({ authorId: value })}

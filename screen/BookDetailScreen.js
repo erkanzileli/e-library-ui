@@ -1,10 +1,12 @@
 import React from 'react'
 import { View, Text, Header, Left, Button, Icon, Body, Title, Right, Toast, Content, Card, CardItem, Grid, Row, Col, Container } from 'native-base';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Alert } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import apolloClient from '../utils/apolloClient';
-import { GET_BOOK } from '../utils/gql';
+import { GET_BOOK, DELETE_BOOK, GET_USER } from '../utils/gql';
 import Loader from '../component/Loader';
+import { getUserRole, getUserName } from '../utils/authorization';
+import { getToken } from '../storage';
 
 const styles = {
     authorText: {
@@ -36,9 +38,11 @@ class BookDetailScreen extends React.Component {
             },
             user: {
                 firstName: null,
-                lastName: null
+                lastName: null,
+                username: null
             },
-        }
+        },
+        user: null
     }
 
     constructor(props) {
@@ -50,6 +54,68 @@ class BookDetailScreen extends React.Component {
     getBook = async bookId => {
         const { data: { book } } = await apolloClient.query({ query: GET_BOOK, variables: { id: bookId }, fetchPolicy: 'no-cache' })
         this.setState({ book, loading: false })
+    }
+
+    deleteBook = (token, { bookId } = this.props.navigation.state.params) => {
+        // this.setState({loading: true})
+        apolloClient.mutate({
+            mutation: DELETE_BOOK,
+            variables: {
+                id: bookId,
+                token
+            }
+        }).then(response => {
+            this.setState({ loading: false })
+            this.props.navigation.navigate('Home')
+        })
+    }
+
+    handleDelete = async () => {
+        const role = await getUserRole()
+        const username = await getUserName()
+        if ((role === 'admin') || username === this.state.book.user.username) {
+            const token = await getToken()
+            Alert.alert(
+                'Kitap silinecek!',
+                'Bu kitabı silmek istiyor musunuz?',
+                [
+                    {
+                        text: 'Sil', onPress: () => this.deleteBook(token)
+                    },
+                    {
+                        text: 'İptal'
+                    }
+                ],
+                {
+                    cancelable: true
+                }
+            )
+        } else {
+            Alert.alert(
+                'Bu kitabı silmeye yetkiniz yok!', '', [],
+                {
+                    cancelable: true
+                }
+            )
+        }
+    }
+
+    updateBook = async () => {
+        apolloClient.query({
+            query: GET_USER,
+            variables: { username: await getUserName() }
+        }).then(response => {
+            const { data: { user } } = response
+            if ((user.username === this.state.book.user.username) || user.type === 'moderator') {
+
+            } else {
+                Alert.alert('Bu kitabı düzenleme yetkiniz yok!')
+            }
+        })
+    }
+
+    handleUpdateBook = () => {
+
     }
 
     render() {
@@ -82,6 +148,12 @@ class BookDetailScreen extends React.Component {
                             duration: 3000
                         })}>
                         <Icon name='download' />
+                    </Button>
+                    <Button transparent onPress={() => this.handleDelete()}>
+                        <Icon name='trash' />
+                    </Button>
+                    <Button transparent onPress={() => { }}>
+                        <Icon type='MaterialIcons' name='edit' />
                     </Button>
                 </Right>
             </Header>

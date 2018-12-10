@@ -14,10 +14,13 @@ import { setToken } from "../storage/index.js";
 
 export default class LoginScreen extends Component {
     state = {
-        loading: false
+        loading: false,
+        username: '',
+        password: ''
     }
 
     handleSubmit = async ({ username, password } = this.state) => {
+        console.warn(username)
         await this.setState({ loading: true });
         await axios({
             url: 'http://192.168.43.181:8080/login',
@@ -26,8 +29,8 @@ export default class LoginScreen extends Component {
                 'Content-Type': 'application/json'
             },
             data: {
-                username: 'admin',
-                password: '123qweasd'
+                username: username,
+                password: password
             }
         }).then(async response => {
             const { data } = response;
@@ -50,7 +53,7 @@ export default class LoginScreen extends Component {
     };
 
     render() {
-        const { loading } = this.state
+        const { loading, username, password } = this.state
         return (
             <View style={styles.container}>
                 <Loader loading={loading} />
@@ -59,15 +62,23 @@ export default class LoginScreen extends Component {
                 </Text>
 
                 <View style={styles.inputContainer}>
-                    <TextInput style={styles.inputs}
+                    <TextInput
+                        value={username}
+                        onChangeText={value => this.setState({ username: value })}
+                        style={styles.inputs}
                         placeholder="Kullanıcı Adı"
-                        underlineColorAndroid='transparent' />
+                        underlineColorAndroid='transparent'
+                    />
                 </View>
                 <View style={styles.inputContainer}>
-                    <TextInput style={styles.inputs}
+                    <TextInput
+                        value={password}
+                        onChangeText={value => this.setState({ password: value })}
+                        style={styles.inputs}
                         placeholder="Şifre"
                         secureTextEntry
-                        underlineColorAndroid='transparent' />
+                        underlineColorAndroid='transparent'
+                    />
                 </View>
                 <TouchableOpacity style={[styles.buttonContainer, styles.loginButton]}
                     onPress={() => this.handleSubmit()}

@@ -6,7 +6,7 @@ import ProfileNavigator from './ProfileNavigator';
 import ManagementNavigator from './ManagementNavigator';
 import { getUserRole } from '../utils/authorization';
 
-const tabs = {
+let tabs = {
     Home: {
         screen: HomeNavigator,
         navigationOptions: () => ({
@@ -20,7 +20,55 @@ const tabs = {
             title: 'Profil',
             tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
         })
+    },
+    // Management = {
+    //     screen: ManagementNavigator,
+    //     navigationOptions: () => getUserRole().then(role => {
+    //         if (role === 'admin') {
+    //             return route = {
+    //                 title: 'Yönetim',
+    //                 tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
+    //             }
+    //         } return null
+    //     })
+    // }
+}
+
+
+const _tabs = () => {
+    let tabs = {
+        Home: {
+            screen: HomeNavigator,
+            navigationOptions: () => ({
+                title: 'Anasayfa',
+                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='home' />
+            })
+        },
+        Profile: {
+            screen: ProfileNavigator,
+            navigationOptions: () => ({
+                title: 'Profil',
+                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
+            })
+        }
     }
+    getUserRole().then(role => {
+        if (role === 'admin') {
+            tabs.Management = {
+                screen: ManagementNavigator,
+                navigationOptions: () => ({
+                    title: 'Yönetim',
+                    tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
+                })
+            }
+        }
+        return tabs
+    })
+}
+
+
+if (true) {
+    console.warn('asdasd')
 }
 
 const options = {
@@ -32,13 +80,15 @@ const options = {
     }
 }
 
-if (getUserRole() === 'admin') {
-    tabs.Management = {
-        screen: ManagementNavigator,
-        navigationOptions: () => ({
-            title: 'Yönetim',
-            tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
-        })
+async function checkRole() {
+    if (await getUserRole() === 'admin') {
+        tabs.Management = {
+            screen: ManagementNavigator,
+            navigationOptions: () => ({
+                title: 'Yönetim',
+                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
+            })
+        }
     }
 }
 

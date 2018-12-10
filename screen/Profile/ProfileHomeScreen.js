@@ -1,5 +1,7 @@
 import React from 'react'
 import {
+    ScrollView,
+    RefreshControl,
     StyleSheet,
     Text,
     View,
@@ -12,63 +14,71 @@ import FloatingActionButton from '../../component/FloatingActionButton';
 import Loader from '../../component/Loader';
 import apolloClient from '../../utils/apolloClient';
 import { GET_USER } from '../../utils/gql';
-
+import { getUserName } from '../../utils/authorization';
 export default class ProfileHomeScreen extends React.Component {
     state = {
         user: {
             firstName: null,
             lastName: null
         },
-        loading: true,
-        refreshed: false
+        loading: false,
+        refreshing: false
     }
 
-    async componentDidMount(props){
-        this.fetchUser(2)
+    componentDidMount(props){
+        this.fetchUser()
     }
 
-    fetchUser = userId => {
+    fetchUser = async () => {
         apolloClient.query({
             query: GET_USER,
-            variables: { id: userId }
-        }).then(response=> this.setState({user: response.data.user, loading: false}))
+            variables: { username: await getUserName() }
+        }).then(response => this.setState({ user: response.data.user, loading: false, refreshing: false }))
+    }
+    _onRefresh = () => {
+        this.setState({ refreshing: true });
+        this.fetchUser()
     }
 
-    render(){
+    render() {
         const { navigation } = this.props
-        const { user, loading,refreshed } = this.state
-        if(navigation.state.params&&navigation.state.params.refresh&&!refreshed){
-            this.setState({loading: true, refreshed: true})
-            this.fetchUser(user.id)
-        }
+        const { user, loading, refreshing } = this.state
         return (
             <Container>
-                <Loader loading={loading} />
-                <FloatingActionButton onPress={() => navigation.navigate({routeName: 'ProfileEdit', params: {user: user}})} style={{ zIndex: 1 }} icon={<Icon name='settings' />} />
-                <View style={{ justifyContent: 'center', alignContent: 'center', backgroundColor: '#66b7d6' }}>
-                    <View style={styles.headerContent}>
-                        <Image style={styles.avatar}
-                            source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
-                        <Text style={styles.name}>
-                            {`${user.firstName} ${user.lastName}`}
-                    </Text>
+                <ScrollView
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={this._onRefresh}
+                        />}
+                >
+                    <Loader loading={loading} />
+                    <FloatingActionButton onPress={() => navigation.navigate({ routeName: 'ProfileEdit', params: { user: user } })} style={{ zIndex: 1 }} icon={<Icon name='settings' />} />
+                    <View style={{ justifyContent: 'center', alignContent: 'center', backgroundColor: '#66b7d6' }}>
+                        <View style={styles.headerContent}>
+                            <Image style={styles.avatar}
+                                source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
+                            <Text style={styles.name}>
+                                {`${user.firstName} ${user.lastName}`}
+                            </Text>
+                        </View>
                     </View>
-                </View>
-                <View style={{ flex: 1 }}>
-                    <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
-                        <Tabs style={{ flex: 1 }}>
-                            <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
-                                <DownloadedBooksTab />
-                            </Tab>
-                            <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
-                                <SavedBooksTab />
-                            </Tab>
-                        </Tabs>
+                    <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
+                            <Tabs style={{ flex: 1 }}>
+                                <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon name='download' /></TabHeading>}>
+                                    <DownloadedBooksTab />
+                                </Tab>
+                                <Tab style={{ flex: 1 }} heading={<TabHeading style={{ backgroundColor: '#5faac6' }} ><Icon type='MaterialIcons' name='bookmark' /></TabHeading>}>
+                                    <SavedBooksTab />
+                                </Tab>
+                            </Tabs>
+                        </View>
                     </View>
-                </View>
+                </ScrollView>
             </Container>
         );
-    
+
     }
 }
 const styles = StyleSheet.create({

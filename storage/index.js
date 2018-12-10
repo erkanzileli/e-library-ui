@@ -1,4 +1,18 @@
-import {AsyncStorage} from 'react-native'
+import { AsyncStorage } from 'react-native'
+
+
+export const getValue = async (key) => {
+    return await AsyncStorage.getItem(key)
+        .then(value => value)
+}
+
+export async function setValue(key, value) {
+    try {
+        await AsyncStorage.setItem(key, value)
+    } catch (error) {
+        console.error(error)
+    }
+}
 
 export const getToken = async () => {
     return await AsyncStorage.getItem('token')
@@ -16,27 +30,6 @@ export async function setToken(token) {
 export async function removeToken() {
     try {
         await AsyncStorage.removeItem('token')
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export const getId = async () => {
-    return await AsyncStorage.getItem('id')
-        .then(value => (value));
-};
-
-export async function setId(id) {
-    try {
-        await AsyncStorage.setItem('id', id)
-    } catch (error) {
-        console.error(error)
-    }
-}
-
-export async function removeId() {
-    try {
-        await AsyncStorage.removeItem('id')
     } catch (error) {
         console.error(error)
     }

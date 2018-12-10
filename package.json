@@ -17,6 +17,7 @@
     "final-form": "^4.10.0",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
+    "jwt-decode": "^2.2.0",
     "lodash": "^4.17.11",
     "native-base": "^2.8.1",
     "prop-types": "^15.6.2",
