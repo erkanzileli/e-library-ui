@@ -11,6 +11,7 @@ import axios from 'axios'
 
 import Loader from "../component/Loader.js";
 import { setToken } from "../storage/index.js";
+import { API_URL } from '../env/environment.js';
 
 export default class LoginScreen extends Component {
     state = {
@@ -23,7 +24,7 @@ export default class LoginScreen extends Component {
         console.warn(username)
         await this.setState({ loading: true });
         await axios({
-            url: 'http://192.168.43.181:8080/login',
+            url: `${API_URL}/login`,
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'

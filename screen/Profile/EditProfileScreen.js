@@ -1,9 +1,10 @@
 import React from 'react'
 import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container } from 'native-base';
-import { Form } from 'react-final-form';
+import { connect } from "react-redux";
 import apolloClient from '../../utils/apolloClient';
 import Loader from '../../component/Loader';
 import { UPDATE_USER } from '../../utils/gql';
+import { setUser, setLoading } from '../../redux/actions';
 
 function validations(values) {
     let result = {
@@ -36,8 +37,8 @@ function validations(values) {
     return result
 }
 
-export class EditProfileScreen extends React.Component {
-    static navigationOptions = ({ navigation }) => ({
+class EditProfileScreen extends React.Component {
+    static navigationOptions = () => ({
         header: <></>
     });
 
@@ -45,12 +46,12 @@ export class EditProfileScreen extends React.Component {
         super(props)
         this.state = {
             loading: false,
-            ...props.navigation.state.params.user
+            ...props.user
         }
     }
 
     handleSubmit = ({ firstName, lastName, email } = this.state) => {
-        const validate=validations({firstName,lastName,email})
+        const validate = validations({ firstName, lastName, email })
         let valid = true
         Object.keys(validate).forEach(key => {
             if (!validate[key]) {
@@ -69,77 +70,76 @@ export class EditProfileScreen extends React.Component {
         }
     }
 
-        submit =({id, firstName, lastName, email} = this.state) => {
-            this.setState({ loading: true })
-        apolloClient.mutate({
+    submit = async ({ id, firstName, lastName, email } = this.state, { setLoading, setUser, navigation } = this.props) => {
+        setLoading(true)
+        const { data: { updateUser } } = await apolloClient.mutate({
             mutation: UPDATE_USER,
             variables: { id, firstName, lastName, email }
-        }).then(response => {
-
-            Toast.show({
-                text: "Kaydedildi!",
-                buttonText: "Okay",
-                duration: 3000
-            })
-            this.setState({ loading: false })
-            this.props.navigation.navigate({ routeName: 'ProfileHome', params: { userId: response.data.updateUser.id, refresh: true} })
         })
+        setUser(updateUser)
+        setLoading(false)
+        Toast.show({
+            text: "Kaydedildi!",
+            buttonText: "Okay",
+            duration: 3000
+        })
+        navigation.goBack()
     }
 
-
     render() {
-        const { firstName, lastName, email, loading } = this.state
-        const {navigation} = this.props
+        const { firstName, lastName, email } = this.state
+        const { navigation, loading } = this.props
         const validate = validations({ firstName, lastName, email })
         return <Container>
             <Header>
-            <Left>
-                <Button transparent onPress={() => navigation.goBack()}>
-                    <Icon name='arrow-back' />
-                </Button>
-            </Left>
-            <Body>
-                <Title>Profil Düzenleme</Title>
-            </Body>
-            <Right>
-                <Button transparent onPress={() => this.handleSubmit()}>
-                    <Icon type='MaterialIcons' name='save' />
-                </Button>
-            </Right>
-        </Header>
+                <Left>
+                    <Button transparent onPress={() => navigation.goBack()}>
+                        <Icon name='arrow-back' />
+                    </Button>
+                </Left>
+                <Body>
+                    <Title>Profil Düzenleme</Title>
+                </Body>
+                <Right>
+                    <Button transparent onPress={() => this.handleSubmit()}>
+                        <Icon type='MaterialIcons' name='save' />
+                    </Button>
+                </Right>
+            </Header>
             <Loader loading={loading} />
             <View style={{ padding: 10 }}>
-                <Form
-                    id='userEditForm'
-                    onSubmit={values => console.warn(values)}
-                    render={() => (<>
-                        <Item fixedLabel error={!validate.firstName}>
-                            <Label> İsim </Label>
-                            <Input
-                                keyboardType='default'
-                                value={firstName}
-                                onChangeText={(value) => this.setState({ firstName: value })}
-                            />
-                        </Item>
-                        <Item fixedLabel error={!validate.lastName}>
-                            <Label> Soyisim </Label>
-                            <Input
-                                keyboardType='default'
-                                value={lastName}
-                                onChangeText={(value) => this.setState({ lastName: value })}
-                            />
-                        </Item>
-                        <Item fixedLabel error={!validate.email}>
-                            <Label> E-Posta </Label>
-                            <Input
-                                keyboardType='default'
-                                value={email}
-                                onChangeText={(value) => this.setState({ email: value })}
-                            />
-                        </Item>
-                    </>)}
-                />
+                <Item fixedLabel error={!validate.firstName}>
+                    <Label> İsim </Label>
+                    <Input
+                        keyboardType='default'
+                        value={firstName}
+                        onChangeText={(value) => this.setState({ firstName: value })}
+                    />
+                </Item>
+                <Item fixedLabel error={!validate.lastName}>
+                    <Label> Soyisim </Label>
+                    <Input
+                        keyboardType='default'
+                        value={lastName}
+                        onChangeText={(value) => this.setState({ lastName: value })}
+                    />
+                </Item>
+                <Item fixedLabel error={!validate.email}>
+                    <Label> E-Posta </Label>
+                    <Input
+                        keyboardType='default'
+                        value={email}
+                        onChangeText={(value) => this.setState({ email: value })}
+                    />
+                </Item>
             </View>
         </Container>
     }
 }
+
+const mapStateToProps = state => {
+    const { userReducer: { user }, commonReducer: { loading } } = state
+    return { user, loading }
+}
+
+export default connect(mapStateToProps, { setUser, setLoading })(EditProfileScreen)

@@ -1,6 +1,6 @@
 import { createStackNavigator } from 'react-navigation'
 import ProfileHomeScreen from '../screen/Profile/ProfileHomeScreen';
-import { EditProfileScreen } from '../screen/Profile/EditProfileScreen';
+import EditProfileScreen from '../screen/Profile/EditProfileScreen';
 
 export default createStackNavigator(
     {

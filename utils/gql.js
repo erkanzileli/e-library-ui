@@ -19,9 +19,20 @@ query bookCategories {
   }`
 
 export const UPDATE_USER = gql`
-mutation updateUser($id: Long!, $firstName: String!, $lastName:String!, $email:String!){
-  updateUser(id: $id, firstName:$firstName, lastName: $lastName, email: $email){
+mutation updateUser(
+  $id: Long!, 
+  $firstName: String!, 
+  $lastName:String!, 
+  $email:String!
+  ){
+  updateUser(
+    id: $id, 
+    firstName:$firstName, 
+    lastName: $lastName, 
+    email: $email
+    ){
     id
+    username
     firstName
     lastName
     email
