@@ -1,10 +1,19 @@
 import React from 'react'
-import { createBottomTabNavigator } from 'react-navigation'
+import { createBottomTabNavigator, createSwitchNavigator } from 'react-navigation'
 import HomeNavigator from './HomeNavigator'
 import { Icon } from 'native-base';
 import ProfileNavigator from './ProfileNavigator';
 import ManagementNavigator from './ManagementNavigator';
 import { getUserRole } from '../utils/authorization';
+
+const options = {
+    initialRouteName: 'Home',
+    tabBarOptions: {
+        activeTintColor: 'black',
+        inactiveTintColor: 'grey',
+        showLabel: false
+    }
+}
 
 let tabs = {
     Home: {
@@ -20,71 +29,63 @@ let tabs = {
             title: 'Profil',
             tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
         })
+    }
+}
+
+let adminTabs = {
+    Home: {
+        screen: HomeNavigator,
+        navigationOptions: () => ({
+            title: 'Anasayfa',
+            tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='home' />
+        })
     },
-    // Management = {
-    //     screen: ManagementNavigator,
-    //     navigationOptions: () => getUserRole().then(role => {
-    //         if (role === 'admin') {
-    //             return route = {
-    //                 title: 'Yönetim',
-    //                 tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
-    //             }
-    //         } return null
-    //     })
-    // }
+    Profile: {
+        screen: ProfileNavigator,
+        navigationOptions: () => ({
+            title: 'Profil',
+            tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
+        })
+    },
+    Management: {
+        screen: ManagementNavigator,
+        navigationOptions: () => ({
+            title: 'Yönetim',
+            tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
+        })
+    }
 }
 
-
-const _tabs = () => {
-    let tabs = {
-        Home: {
-            screen: HomeNavigator,
-            navigationOptions: () => ({
-                title: 'Anasayfa',
-                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='home' />
-            })
-        },
-        Profile: {
-            screen: ProfileNavigator,
-            navigationOptions: () => ({
-                title: 'Profil',
-                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='account' />
-            })
-        }
+class SwitcherScreen extends React.Component {
+    constructor(props) {
+        super(props)
+        this.redirect(props.navigation)
     }
-    getUserRole().then(role => {
+
+    redirect = async navigation => {
+        const role = await getUserRole()
         if (role === 'admin') {
-            tabs.Management = {
-                screen: ManagementNavigator,
-                navigationOptions: () => ({
-                    title: 'Yönetim',
-                    tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
-                })
-            }
+            navigation.navigate('AdminHome')
+        } else {
+            navigation.navigate('Home')
         }
-        return tabs
-    })
-}
+    }
 
-const options = {
-    initialRouteName: 'Home',
-    tabBarOptions: {
-        activeTintColor: 'black',
-        inactiveTintColor: 'grey',
-        showLabel: false
+    render() {
+        return <></>
     }
 }
 
-async function checkRole() {
-    if (await getUserRole() === 'admin') {
-        tabs.Management = {
-            screen: ManagementNavigator,
-            navigationOptions: () => ({
-                title: 'Yönetim',
-                tabBarIcon: ({ tintColor }) => <Icon style={{ color: tintColor }} type='MaterialCommunityIcons' name='settings' />
-            })
-        }
+let switches = {
+    AdminHome: {
+        screen: createBottomTabNavigator(adminTabs, options)
+    },
+    Home: {
+        screen: createBottomTabNavigator(tabs, options)
+    },
+    Switcher: {
+        screen: SwitcherScreen
     }
 }
 
-export default createBottomTabNavigator(tabs, options)
+export default createSwitchNavigator(switches, { initialRouteName: 'Switcher' })
