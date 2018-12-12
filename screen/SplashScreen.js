@@ -18,7 +18,7 @@ class SplashScreen extends React.Component {
       this.props.setUser(user)
       this.props.setLoading(false)
       // forward to HomeScreen
-      this.props.navigation.navigate('Home')
+      this.props.navigation.navigate('Logged')
     } else {
       // forward to LoginScreen
       this.props.navigation.navigate('Login')

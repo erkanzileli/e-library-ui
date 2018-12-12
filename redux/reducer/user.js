@@ -1,7 +1,8 @@
-import { SET_USER } from "../actionTypes";
+import { SET_USER, SET_USERS } from "../actionTypes";
 
 const initialState = {
-    user: {}
+    user: {},
+    users: []
 }
 
 export default function (state = initialState, action) {
@@ -10,6 +11,12 @@ export default function (state = initialState, action) {
             return {
                 ...state,
                 user: action.payload
+            }
+        }
+        case SET_USERS: {
+            return {
+                ...state,
+                users: action.payload
             }
         }
         default:

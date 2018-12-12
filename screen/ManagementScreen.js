@@ -1,60 +1,75 @@
 import React from 'react'
-import { Text, Container, Content, SwipeRow, Button, Icon, Grid, Row, Col } from 'native-base'
-import { TouchableOpacity } from 'react-native'
+import { Text, Container, Content, Toast, SwipeRow, Button, Icon, Grid, Row, Col } from 'native-base'
+import { Alert, TouchableOpacity } from 'react-native'
+import { connect } from "react-redux";
 import Dropdown from '../component/Dropdown';
+import { setUsers } from "../redux/actions";
+import apolloClient from '../utils/apolloClient';
+import { GET_USERS, USER_TO_EDITOR } from '../utils/gql';
+import Loader from '../component/Loader';
 
-export default class ManagementScreen extends React.Component {
+const userRoleOptions = [
+  { label: 'Yönetici', value: 'admin' },
+  { label: 'Moderatör', value: 'moderator' },
+  { label: 'Editör', value: 'editor' },
+  { label: 'Kullanıcı', value: 'user' }
+]
+
+
+class ManagementScreen extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      loading: true
+    }
+    this.fetchUsers()
+  }
+
+  fetchUsers = async () => {
+    const { data: { users } } = await apolloClient.query({ query: GET_USERS, fetchPolicy: 'no-cache' })
+    this.props.setUsers(users)
+    this.setState({ loading: false })
+  }
+
+  handleRequestedUserUpgrade = user => {
+    Alert.alert(
+      'Bu kullanıcı kitap yüklemek istiyor.',
+      'Kitap yüklemesi için Editör seviyesine yükselmesini istiyor musunuz?',
+      [
+        {
+          text: 'Evet', onPress: () => this.upgradeUser(user.id)
+        },
+        {
+          text: 'Hayır'
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
+  upgradeUser = id => {
+    this.setState({ loading: true })
+    apolloClient.mutate({
+      mutation: USER_TO_EDITOR,
+      variables: { id }
+    }).then(response => {
+      const { data: { userToEditor } } = response
+      let { users } = this.props
+      users[users.findIndex(user => user.id === id)] = { ...userToEditor }
+      this.props.setUsers(users)
+      Toast.show({
+        text: "Kullanıcı yükseltild!",
+        buttonText: "Tamam",
+        duration: 3000
+      })
+    })
+    this.setState({ loading: false })
+  }
+
   render() {
-    const userRoles = [
-      { label: 'Yönetici', value: 'admin' },
-      { label: 'Moderatör', value: 'moderator' },
-      { label: 'Editör', value: 'editor' },
-      { label: 'Kullanıcı', value: 'user' }
-    ]
-    const userRows = [
-      {
-        id: 1,
-        firstName: 'John',
-        lastName: 'Doe',
-        role: 'admin'
-      },
-      {
-        id: 2,
-        firstName: 'Tom',
-        lastName: 'Swiss',
-        role: 'editor'
-      },
-      {
-        id: 3,
-        firstName: 'Micheal',
-        lastName: 'Tos',
-        role: 'moderator'
-      },
-      {
-        id: 4,
-        firstName: 'Sam',
-        lastName: 'Jackson',
-        role: 'user',
-        isRequested: true
-      },
-      {
-        id: 5,
-        firstName: 'Will',
-        lastName: 'Hanks',
-        role: 'user',
-        isRequested: false
-      }
-    ].sort((a, b) => {
-      let nameA = a.firstName.toUpperCase()
-      let nameB = b.firstName.toUpperCase()
-      if (nameA > nameB) {
-        return 1
-      }
-      if (nameA < nameB) {
-        return -1
-      }
-      return 0
-    }).map(user =>
+    const { loading } = this.state
+    const { users } = this.props
+    const userRows = users.map(user =>
       (<SwipeRow key={user.id}
         rightOpenValue={-100}
         body={
@@ -69,16 +84,15 @@ export default class ManagementScreen extends React.Component {
               </Col>
               <Col siz={3} style={{ justifyContent: 'center' }}>
                 {
-                  user.role === 'user' ?
-                    user.isRequested ?
-                      <TouchableOpacity onPress={() => alert('Yükseltmek istiyor musunuz?')}>
-                        <Icon type='FontAwesome' name="angle-double-up" />
-                      </TouchableOpacity>
-                      : undefined : undefined
+                  user.type === 'user' && user.isRequested ?
+                    <TouchableOpacity onPress={() => this.handleRequestedUserUpgrade(user)}>
+                      <Icon type='FontAwesome' name="angle-double-up" />
+                    </TouchableOpacity>
+                    : <></>
                 }
               </Col>
               <Col size={4}>
-                <Dropdown options={userRoles} value={user.role} />
+                <Dropdown options={userRoleOptions} value={user.type} />
               </Col>
             </Row>
           </Grid>
@@ -90,8 +104,8 @@ export default class ManagementScreen extends React.Component {
         }
       />
       ))
-
     return <Container>
+      <Loader loading={loading} />
       <Content>
         <Grid>
           <Row>
@@ -108,6 +122,14 @@ export default class ManagementScreen extends React.Component {
     </Container>
   }
 }
+
+const mapStateToProps = state => {
+  const { userReducer: { users } } = state
+  return { users }
+}
+
+export default connect(mapStateToProps, { setUsers })(ManagementScreen)
+
 const styles = {
   userCol: {
     flex: 1,

@@ -199,6 +199,35 @@ export const GET_USER = gql`
   }
 `
 
+export const GET_USERS = gql`
+query users{
+  users{
+    id
+    firstName
+    lastName
+    username
+    email
+    type
+    isRequested
+    status
+  }
+}`
+
+export const USER_TO_EDITOR =   gql`
+mutation($id: Long!){
+  userToEditor(id: $id){
+    id
+    firstName
+    lastName
+    username
+    email
+    type
+    isRequested
+    status
+  }
+}
+`
+
 export const DELETE_BOOK = gql`
 mutation deleteBook($id:Long!, $token: String!){
   deleteBook(id: $id, token: $token)
