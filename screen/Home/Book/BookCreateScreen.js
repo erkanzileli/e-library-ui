@@ -1,10 +1,12 @@
 import React from 'react'
 import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container } from 'native-base';
+import { connect } from "react-redux";
 import apolloClient from '../../../utils/apolloClient';
 import Loader from '../../../component/Loader';
 import Dropdown from '../../../component/Dropdown';
-import { AUTHORS, BOOK_CATEGORIES, CREATE_BOOK } from '../../../utils/gql';
+import { CREATE_BOOK, ALL_AUTHORS_AND_CATEGORIES } from '../../../utils/gql';
 import { getUserName } from '../../../utils/authorization';
+import { addBook } from "../../../redux/actions";
 
 function validations(values) {
     let result = {
@@ -48,7 +50,7 @@ function validations(values) {
     return result
 }
 
-export class BookCreateScreen extends React.Component {
+class BookCreateScreen extends React.Component {
     static navigationOptions = ({ navigation }) => ({
         header: <></>
     });
@@ -66,7 +68,7 @@ export class BookCreateScreen extends React.Component {
             userId: 1,
             authors: [],
             bookCategories: [],
-            authorOptions:[],
+            authorOptions: [],
             bookCategoryOptions: [],
             validation: {
                 name: true,
@@ -80,14 +82,18 @@ export class BookCreateScreen extends React.Component {
     }
 
     async componentDidMount(props) {
-        let { data: { authors } } = await apolloClient.query({ query: AUTHORS, fetchPolicy: 'no-cache' })
-        let { data: { bookCategories } } = await apolloClient.query({ query: BOOK_CATEGORIES, fetchPolicy: 'no-cache' })
+        let { data: { authors, bookCategories } } = await apolloClient
+            .query({
+                query: ALL_AUTHORS_AND_CATEGORIES,
+                fetchPolicy: 'no-cache'
+            })
         const authorOptions = authors.map(author => ({ value: author.id, label: `${author.firstName} ${author.lastName}` }))
         const bookCategoryOptions = bookCategories.map(category => ({ value: category.id, label: category.name }))
-        this.setState({ authors, bookCategories, authorOptions, bookCategoryOptions, 
+        this.setState({
+            authors, bookCategories, authorOptions, bookCategoryOptions,
             authorId: authorOptions.length > 0 ? authorOptions[0].value : null,
             categoryId: bookCategoryOptions.length > 0 ? bookCategoryOptions[0].value : null
-         })
+        })
     }
 
     handleSubmit = ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
@@ -122,6 +128,7 @@ export class BookCreateScreen extends React.Component {
                 buttonText: "Okay",
                 duration: 3000
             })
+            this.props.addBook(response.data.createBook)
             this.setState({ loading: false })
             this.props.navigation.navigate({ routeName: 'Home', params: { bookId: response.data.createBook.id } })
         })
@@ -161,6 +168,7 @@ export class BookCreateScreen extends React.Component {
                     <Item fixedLabel error={!validate.title}>
                         <Label> Konu </Label>
                         <Input
+                            multiline
                             keyboardType='default'
                             value={title}
                             onChangeText={value => this.setState({ title: value })}
@@ -175,6 +183,7 @@ export class BookCreateScreen extends React.Component {
                     <Item fixedLabel error={!validate.description}>
                         <Label> Açıklama </Label>
                         <Input
+                            multiline
                             keyboardType='default'
                             value={description}
                             onChangeText={value => this.setState({ description: value })}
@@ -199,3 +208,5 @@ export class BookCreateScreen extends React.Component {
         </Container>
     }
 }
+
+export default connect(null, { addBook })(BookCreateScreen)

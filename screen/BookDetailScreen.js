@@ -3,10 +3,12 @@ import { View, Text, Header, Left, Button, Icon, Body, Title, Right, Toast, Cont
 import { TouchableOpacity, Alert } from 'react-native';
 import StarRating from 'react-native-star-rating';
 import apolloClient from '../utils/apolloClient';
+import { connect } from "react-redux";
 import { GET_BOOK, DELETE_BOOK, GET_USER } from '../utils/gql';
 import Loader from '../component/Loader';
 import { getUserRole, getUserName } from '../utils/authorization';
 import { getToken } from '../storage';
+import { deleteBook, setBook } from "../redux/actions";
 
 const styles = {
     authorText: {
@@ -24,48 +26,34 @@ class BookDetailScreen extends React.Component {
     });
 
     state = {
-        loading: true,
-        book: {
-            name: null,
-            title: null,
-            description: null,
-            pageCount: null,
-            downloadCount: 0,
-            likeCount: 0,
-            author: {
-                firstName: null,
-                lastName: null
-            },
-            user: {
-                firstName: null,
-                lastName: null,
-                username: null
-            },
-        },
-        user: null
+        loading: true
     }
 
     constructor(props) {
         super(props)
-        const { bookId } = props.navigation.state.params
+        const bookId = props.navigation.getParam('bookId')
         this.getBook(bookId)
     }
 
     getBook = async bookId => {
         const { data: { book } } = await apolloClient.query({ query: GET_BOOK, variables: { id: bookId }, fetchPolicy: 'no-cache' })
-        this.setState({ book, loading: false })
+        this.props.setBook(book)
+        this.setState({ loading: false })
     }
 
-    deleteBook = (token, { bookId } = this.props.navigation.state.params) => {
-        // this.setState({loading: true})
+    deleteBook = (token, { id } = this.props.book) => {
+        this.setState({ loading: true })
         apolloClient.mutate({
             mutation: DELETE_BOOK,
-            variables: {
-                id: bookId,
-                token
-            }
+            variables: { id, token }
         }).then(response => {
+            this.props.deleteBook(id)
             this.setState({ loading: false })
+            Toast.show({
+                text: "Silindi!",
+                buttonText: "Okay",
+                duration: 3000
+            })
             this.props.navigation.navigate('Home')
         })
     }
@@ -73,7 +61,7 @@ class BookDetailScreen extends React.Component {
     handleDelete = async () => {
         const role = await getUserRole()
         const username = await getUserName()
-        if ((role === 'admin') || username === this.state.book.user.username) {
+        if ((role === 'admin') || username === this.props.book.user.username) {
             const token = await getToken()
             Alert.alert(
                 'Kitap silinecek!',
@@ -100,27 +88,24 @@ class BookDetailScreen extends React.Component {
         }
     }
 
-    updateBook = async () => {
-        apolloClient.query({
-            query: GET_USER,
-            variables: { username: await getUserName() }
-        }).then(response => {
-            const { data: { user } } = response
-            if ((user.username === this.state.book.user.username) || user.type === 'moderator') {
+    updateBook = (username) => {
 
-            } else {
-                Alert.alert('Bu kitabı düzenleme yetkiniz yok!')
-            }
-        })
     }
 
-    handleUpdateBook = () => {
-
+    handleUpdateBook = ({ book, user, navigation } = this.props) => {
+        if ((book.user.username === user.username) || user.username === 'moderator') {
+            navigation.navigate('BookEdit', { book })
+        } else {
+            Alert.alert(
+                'Bu kitabı düzenleme yetkiniz yok!', '', [],
+                { cancelable: true }
+            )
+        }
     }
 
     render() {
         const { navigation } = this.props
-        const { name, title, description, pageCount, downloadCount, likeCount, author, category, user } = this.state.book
+        const { name, title, description, pageCount, downloadCount, likeCount, author, user } = this.props.book
         return <Container>
             <Loader loading={this.state.loading} />
             <Header>
@@ -152,7 +137,7 @@ class BookDetailScreen extends React.Component {
                     <Button transparent onPress={() => this.handleDelete()}>
                         <Icon name='trash' />
                     </Button>
-                    <Button transparent onPress={() => { }}>
+                    <Button transparent onPress={() => this.handleUpdateBook()}>
                         <Icon type='MaterialIcons' name='edit' />
                     </Button>
                 </Right>
@@ -219,4 +204,9 @@ class BookDetailScreen extends React.Component {
     }
 }
 
-export default BookDetailScreen
+const mapStateToProps = state => {
+    const { bookReducer: { book }, userReducer: { user } } = state
+    return { book, user }
+}
+
+export default connect(mapStateToProps, { deleteBook, setBook })(BookDetailScreen)

@@ -47,68 +47,50 @@ const styles = StyleSheet.create({
     }
 });
 class ProfileHomeScreen extends React.Component {
-    state = {
-        refreshing: false
-    }
-
-    _onRefresh = () => {
-        this.setState({ refreshing: true });
-        this.fetchUser()
-    }
-
     render() {
         const { user, loading, navigation } = this.props
-        const { refreshing } = this.state
         return (
             <Container>
-                <ScrollView
-                    refreshControl={
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={this._onRefresh}
-                        />}
-                >
-                    <Loader loading={loading} />
-                    <FloatingActionButton
-                        onPress={() => navigation.navigate('ProfileEdit')}
-                        style={{ zIndex: 1 }}
-                        icon={<Icon name='settings' />}
-                    />
-                    <View
-                        style={{
-                            justifyContent: 'center',
-                            alignContent: 'center',
-                            backgroundColor: '#66b7d6'
-                        }}>
-                        <View style={styles.headerContent}>
-                            <Image style={styles.avatar}
-                                source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
-                            <Text style={styles.name}>
-                                {`${user.firstName} ${user.lastName}`}
-                            </Text>
-                        </View>
+                <Loader loading={loading} />
+                <FloatingActionButton
+                    onPress={() => navigation.navigate('ProfileEdit')}
+                    style={{ zIndex: 1 }}
+                    icon={<Icon name='settings' />}
+                />
+                <View
+                    style={{
+                        justifyContent: 'center',
+                        alignContent: 'center',
+                        backgroundColor: '#66b7d6'
+                    }}>
+                    <View style={styles.headerContent}>
+                        <Image style={styles.avatar}
+                            source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
+                        <Text style={styles.name}>
+                            {`${user.firstName} ${user.lastName}`}
+                        </Text>
                     </View>
-                    <View style={{ flex: 1 }}>
-                        <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
-                            <Tabs style={{ flex: 1 }}>
-                                <Tab style={{ flex: 1 }}
-                                    heading={<TabHeading style={{ backgroundColor: '#5faac6' }}
-                                    ><Icon name='download' /></TabHeading>}
-                                >
-                                    <DownloadedBooksTab />
-                                </Tab>
-                                <Tab style={{ flex: 1 }}
-                                    heading={<TabHeading
-                                        style={{ backgroundColor: '#5faac6' }}>
-                                        <Icon type='MaterialIcons' name='bookmark' />
-                                    </TabHeading>}
-                                >
-                                    <SavedBooksTab />
-                                </Tab>
-                            </Tabs>
-                        </View>
+                </View>
+                <View style={{ flex: 1 }}>
+                    <View style={{ flex: 1, justifyContent: 'space-evenly', alignContent: 'center' }}>
+                        <Tabs style={{ flex: 1 }}>
+                            <Tab style={{ flex: 1 }}
+                                heading={<TabHeading style={{ backgroundColor: '#5faac6' }}
+                                ><Icon name='download' /></TabHeading>}
+                            >
+                                <DownloadedBooksTab />
+                            </Tab>
+                            <Tab style={{ flex: 1 }}
+                                heading={<TabHeading
+                                    style={{ backgroundColor: '#5faac6' }}>
+                                    <Icon type='MaterialIcons' name='bookmark' />
+                                </TabHeading>}
+                            >
+                                <SavedBooksTab />
+                            </Tab>
+                        </Tabs>
                     </View>
-                </ScrollView>
+                </View>
             </Container>
         );
     }

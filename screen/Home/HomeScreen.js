@@ -2,20 +2,37 @@ import React from 'react';
 import { Container, Icon } from 'native-base';
 import { ScrollView, RefreshControl, Alert } from "react-native";
 import FloatingActionButton from '../../component/FloatingActionButton';
-import { GET_BOOKS, REQUEST_USER } from '../../utils/gql';
+import { GET_BOOKS, REQUEST_USER, GET_USER } from '../../utils/gql';
 import apolloClient from '../../utils/apolloClient';
 import BookListItem from '../../component/Book/BookListItem';
 import Loader from '../../component/Loader';
 import { connect } from "react-redux";
-import { setBooks, setLoading } from '../../redux/actions';
+import { setBooks, setLoading, setUser } from '../../redux/actions';
+import { getUserName } from '../../utils/authorization';
 
 class HomeScreen extends React.Component {
   state = {
     refreshing: false
   }
 
-  componentDidMount(props) {
+  constructor(props) {
+    super(props)
+    if (!props.user.id) {
+      this.fetchUser()
+    }
     this.fetchData()
+  }
+
+  fetchUser = async () => {
+    this.props.setLoading(true)
+    let { data: { user } } = await apolloClient
+      .query({
+        query: GET_USER,
+        variables: { username: await getUserName() },
+        fetchPolicy: 'no-cache'
+      })
+    this.props.setUser(user)
+    this.props.setLoading(false)
   }
 
   fetchData = async () => {
@@ -93,7 +110,7 @@ class HomeScreen extends React.Component {
             />
           }
         >
-          {allBooks.map(book => (<BookListItem key={book.id} navigation={navigation} {...book} />))}
+          {allBooks.map(book => (<BookListItem key={book.id} navigation={navigation} book={book} />))}
         </ScrollView>
       </Container>
     )
@@ -105,4 +122,4 @@ const mapStateToProps = state => {
   return { allBooks, user, loading }
 }
 
-export default connect(mapStateToProps, { setBooks, setLoading })(HomeScreen)
+export default connect(mapStateToProps, { setBooks, setLoading, setUser })(HomeScreen)

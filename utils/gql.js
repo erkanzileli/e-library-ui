@@ -97,13 +97,13 @@ query book($id: Long!){
       downloadCount
       likeCount
       status
+      downloadCount
+      likeCount
       author {
         id
         firstName
         lastName
       }
-      downloadCount
-      likeCount
       user {
         id
         firstName
@@ -114,11 +114,76 @@ query book($id: Long!){
       category {
         id
         name
-      }   
-      
+      }         
     }
   }
   `
+
+export const UPDATE_BOOK = gql`
+mutation updateBook(
+  $id: Long!
+  $token: String!
+  $userId: Long!
+  $authorId: Long!
+  $categoryId: Long!
+  $name: String!
+  $title: String!
+  $description: String!
+  $pageCount: Int!
+  ){
+  updateBook(
+    id: $id
+    token: $token
+    name: $name
+    title: $title
+    description: $description
+    pageCount: $pageCount
+    authorId: $authorId
+    categoryId: $categoryId
+    userId: $userId
+    ){
+      id
+      name
+      title
+      description
+      pageCount
+      downloadCount
+      likeCount
+      status
+      downloadCount
+      likeCount
+      author {
+        id
+        firstName
+        lastName
+      }
+      user {
+        id
+        firstName
+        lastName
+        username
+        email
+      }
+      category {
+        id
+        name
+      }
+  }
+}
+`
+
+export const ALL_AUTHORS_AND_CATEGORIES = gql`
+query authorAndBookCategories {
+  authors {
+    id
+    firstName
+    lastName
+  }
+  bookCategories{
+    id
+    name
+  }
+}`
 
 export const GET_USER = gql`
   query user($username: String!){
@@ -134,7 +199,7 @@ export const GET_USER = gql`
   }
 `
 
-export const DELETE_BOOK = gql `
+export const DELETE_BOOK = gql`
 mutation deleteBook($id:Long!, $token: String!){
   deleteBook(id: $id, token: $token)
 }
@@ -155,23 +220,12 @@ query books{
       description
       pageCount
       status
+      downloadCount
+      likeCount
       author {
         id
         firstName
         lastName
-      }
-      downloadCount
-      likeCount
-      user {
-        id
-        firstName
-        lastName
-        username
-        email
-      }
-      category {
-        id
-        name
       }
     }
   }

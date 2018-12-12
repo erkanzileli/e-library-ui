@@ -3,7 +3,6 @@ import { Card, CardItem, Text, Body, Content, View, Icon } from 'native-base';
 import { TouchableOpacity } from 'react-native'
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import StarRating from 'react-native-star-rating';
-
 const styles = {
     authorText: {
         fontSize: 13,
@@ -16,14 +15,14 @@ const styles = {
 }
 
 export default function BookListItem(props) {
-    const { author, description, title, downloadCount, likeCount, name, saved, navigation } = props
+    const { id, author, title, downloadCount, likeCount, name, saved } = props.book
     return <Content style={{ flex: 1 }}>
         <Card>
             <CardItem header bordered>
                 <Grid>
                     <Row>
                         <Col size={5}>
-                            <TouchableOpacity onPress={() => navigation.navigate('BookDetail', { bookId: props.id })}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate('BookDetail', { bookId: id })}>
                                 <Text style={{ fontSize: 20 }}>{name}</Text>
                             </TouchableOpacity>
                         </Col>
@@ -68,6 +67,6 @@ export default function BookListItem(props) {
                 </Grid>
             </CardItem>
         </Card>
-    </Content>
+    </Content >
 }
 

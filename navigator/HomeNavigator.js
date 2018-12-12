@@ -1,7 +1,8 @@
 import { createStackNavigator, map } from 'react-navigation'
 import HomeScreen from '../screen/Home/HomeScreen'
 import BookDetailScreen from '../screen/BookDetailScreen';
-import { BookCreateScreen } from '../screen/Home/Book/BookCreateScreen';
+import BookCreateScreen from '../screen/Home/Book/BookCreateScreen';
+import BookEditScreen from '../screen/BookEditScreen';
 
 export default createStackNavigator(
   {
@@ -13,6 +14,9 @@ export default createStackNavigator(
     },
     BookDetail: {
       screen: BookDetailScreen
+    },
+    BookEdit: {
+      screen: BookEditScreen
     },
     CreateBook: {
       screen: BookCreateScreen

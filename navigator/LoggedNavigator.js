@@ -66,11 +66,6 @@ const _tabs = () => {
     })
 }
 
-
-if (true) {
-    console.warn('asdasd')
-}
-
 const options = {
     initialRouteName: 'Home',
     tabBarOptions: {
