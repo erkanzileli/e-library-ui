@@ -240,6 +240,21 @@ export const REQUEST_USER = gql`
   }
 `
 
+export const CHANGE_USER_TYPE = gql`
+mutation changeUserType($id:Long!, $type:String!){
+  changeUserType(id: $id, type: $type){
+    id
+    firstName
+    lastName
+    username
+    email
+    type
+    isRequested
+    status
+  }
+}
+`
+
 export const GET_BOOKS = gql`
 query books{
     books{

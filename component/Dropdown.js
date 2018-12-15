@@ -3,23 +3,13 @@ import { Item, Picker, Label } from 'native-base'
 import PropTypes from 'prop-types'
 
 class Dropdown extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      value: this.props.value
-    }
-  }
 
-  handleChanged = async (value) => {
-    await this.setState({
-      value: value
-    })
-    await this.props.onChange(value)
+  handleChanged = value => {
+    this.props.onChange(value)
   }
 
   render() {
-    const { options, label } = this.props
-    const { value } = this.state
+    const { options, label, value } = this.props
     return <Item picker>
       <Label> {label} </Label>
       <Picker
