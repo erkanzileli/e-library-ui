@@ -1,18 +1,21 @@
 import React from 'react'
 import {
-    ScrollView,
-    RefreshControl,
+    Alert,
     StyleSheet,
     Text,
     View,
     Image
 } from 'react-native';
-import { Container, Tabs, Tab, TabHeading, Icon } from 'native-base';
+import { Container, Tabs, Tab, TabHeading, Icon, Button } from 'native-base';
 import { connect } from "react-redux";
 import DownloadedBooksTab from './Tabs/DownloadedBooks/DownloadedBooksTab';
 import SavedBooksTab from './Tabs/SavedBooks/SavedBooksTab';
 import FloatingActionButton from '../../component/FloatingActionButton';
 import Loader from '../../component/Loader';
+import { clearStorage } from '../../storage';
+import apolloClient from '../../utils/apolloClient';
+import { GET_USER } from '../../utils/gql';
+import { getUserName } from '../../utils/authorization';
 
 const styles = StyleSheet.create({
     header: {
@@ -47,6 +50,23 @@ const styles = StyleSheet.create({
     }
 });
 class ProfileHomeScreen extends React.Component {
+    handleLogoutButtonPress = () => {
+        Alert.alert(
+            'Uyarı',
+            'Çıkış yapmak istiyor musunuz?',
+            [
+                {
+                    text: 'Evet', onPress: () => {
+                        clearStorage()
+                        this.props.navigation.navigate('Login')
+                    }
+                },
+                { text: 'Hayır' }
+            ],
+            { cancelable: true }
+        )
+    }
+
     render() {
         const { user, loading, navigation } = this.props
         return (
@@ -63,6 +83,16 @@ class ProfileHomeScreen extends React.Component {
                         alignContent: 'center',
                         backgroundColor: '#66b7d6'
                     }}>
+                    <Button
+                        style={{
+                            backgroundColor: '#66b7d6'
+                        }}
+                        onPress={this.handleLogoutButtonPress}
+                    >
+                        <Text style={{ ...styles.name, fontSize: 12 }}>
+                            Çıkış Yap
+                        </Text>
+                    </Button>
                     <View style={styles.headerContent}>
                         <Image style={styles.avatar}
                             source={{ uri: 'https://bootdey.com/img/Content/avatar/avatar1.png' }} />
@@ -101,5 +131,5 @@ const mapStateToProps = state => {
     return { user, loading }
 }
 
-export default connect(mapStateToProps, null)(ProfileHomeScreen)
+export default connect(mapStateToProps)(ProfileHomeScreen)
 

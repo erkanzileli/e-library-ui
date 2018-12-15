@@ -68,7 +68,7 @@ class HomeScreen extends React.Component {
             {
               text: 'Evet', onPress: () => {
                 this.props.setLoading(true)
-                this.handleRequest().then(response => {
+                this.handleRequest(user).then(response => {
                   Alert.alert(
                     'İşlem başarılı',
                     'Kitap yükleme isteğiniz Sistem Yöneticisine iletildi.',
@@ -76,6 +76,7 @@ class HomeScreen extends React.Component {
                     { cancelable: true }
                   )
                 })
+                this.props.setUser({...user, isRequested: true})
                 this.props.setLoading(false)
               }
             },
@@ -89,7 +90,7 @@ class HomeScreen extends React.Component {
     }
   }
 
-  handleRequest = () => apolloClient.mutate({ mutation: REQUEST_USER, variables: { username: user.username } })
+  handleRequest = user => apolloClient.mutate({ mutation: REQUEST_USER, variables: { username: user.username } })
 
   render() {
     const { navigation, allBooks, loading } = this.props

@@ -9,8 +9,12 @@ import {
 } from 'react-native';
 import axios from 'axios'
 import Loader from "../component/Loader.js";
-import { setToken } from "../storage/index.js";
+import { setToken, setValue } from "../storage/index.js";
 import { API_URL } from '../env/environment.js';
+import { connect } from "react-redux";
+import { setUser } from '../redux/actions';
+import { GET_USER } from '../utils/gql.js';
+import apolloClient from '../utils/apolloClient.js';
 
 const styles = StyleSheet.create({
     container: {
@@ -66,37 +70,69 @@ class LoginScreen extends Component {
         password: ''
     }
 
-    handleSubmit = async ({ username, password } = this.state) => {
-        await this.setState({ loading: true });
-        await axios({
-            url: `${API_URL}/login`,
+    submit = async ({ username, password } = this.state) => {
+        // this.setState({ loading: true });
+        let response = await fetch(`${API_URL}/users/check`, {
             method: 'post',
+            body: JSON.stringify({ username }),
             headers: {
                 'Content-Type': 'application/json'
-            },
-            data: {
-                username: username,
-                password: password
             }
-        }).then(async response => {
-            const { data } = response;
-            await setToken(data.token);
-            await this.props.navigation.navigate('Logged')
-        }).catch(async error => {
-            const { response: { status } } = error;
-            if (status === 401) {
-                Alert.alert(
-                    'Hata',
-                    'Kullanıcı adı veya şifre yanlış',
-                    [],
-                    { cancelable: true }
-                )
+        })
+        if (response.status === 200) {
+            let _response = await response.json()
+            if (_response) {
+                axios({
+                    url: `${API_URL}/login`,
+                    method: 'post',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    data: {
+                        username: username,
+                        password: password
+                    }
+                }).then(async response => {
+                    const { data } = response;
+                    setToken(data.token);
+                    setValue('username', username)
+                    let { data: { user } } = await apolloClient.query({ query: GET_USER, variables: { username: username }, fetchPolicy: 'no-cache' })
+                    this.props.setUser(user)
+                    this.props.navigation.navigate('Logged')
+                }).catch(async error => {
+                    const { response: { status } } = error;
+                    if (status === 401) {
+                        Alert.alert(
+                            'Hata',
+                            'Kullanıcı adı veya şifre yanlış',
+                            [],
+                            { cancelable: true }
+                        )
+                    } else {
+                        console.warn(error)
+                    }
+                });
             } else {
-                console.warn(error)
+                alert('Bu hesap belirsiz süreliğine engellenmiştir.')
             }
-        });
+        } else {
+            alert('API hizmeti ile ilgili bir sorun mevcut.')
+        }
         this.setState({ loading: false })
     };
+
+    handleSubmit = ({ username, password } = this.state) => {
+        if (username === '' || password === '') {
+            Alert.alert(
+                'Hata',
+                'Kullanıcı adı ve şifre boş bırakılamaz',
+                [],
+                { cancelable: true }
+            )
+        } else {
+            this.submit()
+        }
+    }
 
     render() {
         const { loading, username, password } = this.state
@@ -140,4 +176,4 @@ class LoginScreen extends Component {
     }
 }
 
-export default LoginScreen
+export default connect(null, { setUser })(LoginScreen)

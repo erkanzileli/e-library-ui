@@ -5,8 +5,9 @@ import { connect } from "react-redux";
 import Dropdown from '../component/Dropdown';
 import { setUsers } from "../redux/actions";
 import apolloClient from '../utils/apolloClient';
-import { GET_USERS, USER_TO_EDITOR, CHANGE_USER_TYPE } from '../utils/gql';
+import { GET_USERS, USER_TO_EDITOR, CHANGE_USER_TYPE, IGNORE_USER } from '../utils/gql';
 import Loader from '../component/Loader';
+import { getUserName } from '../utils/authorization';
 
 const userRoleOptions = [
   { label: 'Yönetici', value: 'admin' },
@@ -27,7 +28,9 @@ class ManagementScreen extends React.Component {
   }
 
   fetchUsers = async () => {
-    const { data: { users } } = await apolloClient.query({ query: GET_USERS, fetchPolicy: 'network-only' })
+    let { data: { users } } = await apolloClient.query({ query: GET_USERS, fetchPolicy: 'network-only' })
+    const username = await getUserName()
+    users = users.filter(user => user.username !== username)
     this.props.setUsers(users)
     this.setState({ loading: false })
   }
@@ -70,6 +73,24 @@ class ManagementScreen extends React.Component {
     })
   }
 
+  ignoreUser = async username => {
+    this.setState({ loading: true })
+    apolloClient.mutate({
+      mutation: IGNORE_USER,
+      variables: { username }
+    }).then(response => {
+      const { data: { ignoreUser } } = response
+      let users = this.props.users
+      users[users.findIndex(user => user.username === username)] = ignoreUser
+      Toast.show({
+        text: "Kullanıcı engellendi!",
+        buttonText: "Tamam",
+        duration: 3000
+      })
+      this.setState({ loading: false })
+    })
+  }
+
   handleChangeUserType = (id, type) => {
     Alert.alert(
       'Bu kullanıcının yetkisini değiştirmek istediğinize emin misiniz?', '',
@@ -92,6 +113,21 @@ class ManagementScreen extends React.Component {
       [
         {
           text: 'Evet', onPress: () => this.upgradeUser(user.id)
+        },
+        {
+          text: 'Hayır'
+        }
+      ],
+      { cancelable: true }
+    )
+  }
+
+  handleUserIgnore = username => {
+    Alert.alert(
+      'Bu kullanıcıyı engellemek istiyor musunuz?', '',
+      [
+        {
+          text: 'Evet', onPress: () => this.ignoreUser(username)
         },
         {
           text: 'Hayır'
@@ -164,7 +200,7 @@ class ManagementScreen extends React.Component {
                   </Grid>
                 }
                 right={
-                  <Button danger onPress={() => alert('Silmek istiyor musunuz?')}>
+                  <Button danger onPress={() => this.handleUserIgnore(user.username)}>
                     <Icon active name="trash" />
                   </Button>
                 }

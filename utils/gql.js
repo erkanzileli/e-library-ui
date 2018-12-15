@@ -199,6 +199,21 @@ export const GET_USER = gql`
   }
 `
 
+export const IGNORE_USER = gql`
+mutation($username: String!){
+  ignoreUser(username: $username){
+    id
+    firstName
+    lastName
+    username
+    email
+    type
+    isRequested
+    status
+  }
+}
+`
+
 export const GET_USERS = gql`
 query users{
   users{

@@ -14,6 +14,14 @@ export async function setValue(key, value) {
     }
 }
 
+export async function clearStorage() {
+    try {
+        await AsyncStorage.clear()
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const getToken = async () => {
     return await AsyncStorage.getItem('token')
         .then(value => (value));
