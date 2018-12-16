@@ -7,6 +7,7 @@ import Dropdown from '../../../component/Dropdown';
 import { CREATE_BOOK, ALL_AUTHORS_AND_CATEGORIES } from '../../../utils/gql';
 import { getUserName } from '../../../utils/authorization';
 import { addBook } from "../../../redux/actions";
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 
 function validations(values) {
     let result = {
@@ -134,6 +135,22 @@ class BookCreateScreen extends React.Component {
         })
     }
 
+    handeFileChoose = () => {
+        DocumentPicker.show({
+            filetype: [DocumentPickerUtil.pdf()],
+          },(error,res) => {
+            // Android
+            console.warn(
+               res.uri,
+               res.type, // mime type
+               res.fileName,
+               res.fileSize
+            );
+          });
+      
+
+    }
+
     render() {
         const { name, title, description, pageCount, loading, authorOptions, authorId, categoryId, bookCategoryOptions } = this.state
         const { navigation } = this.props
@@ -151,6 +168,9 @@ class BookCreateScreen extends React.Component {
                 <Right>
                     <Button transparent onPress={() => this.handleSubmit()}>
                         <Icon type='MaterialIcons' name='save' />
+                    </Button>
+                    <Button transparent onPress={() => this.handeFileChoose()}>
+                        <Icon type='MaterialIcons' name='upload' />
                     </Button>
                 </Right>
             </Header>

@@ -82,7 +82,7 @@ class HomeScreen extends React.Component {
             },
             [{ text: 'Hayır' }]
           ],
-          { cancelable: false }
+          { cancelable: true }
         )
       }
     } else {
