@@ -27,11 +27,16 @@
     "react-native": "0.57.4",
     "react-native-document-picker": "^2.2.0",
     "react-native-easy-grid": "^0.2.0",
+    "react-native-file-uploader": "^0.0.2",
+    "react-native-fs": "^2.12.1",
+    "react-native-get-real-path": "git+https://github.com/Wraptime/react-native-get-real-path.git",
     "react-native-star-rating": "^1.1.0",
+    "react-native-upload-file": "^0.1.1",
     "react-navigation": "^2.18.2",
     "react-redux": "^6.0.0",
     "redux": "^4.0.1",
-    "redux-axios-middleware": "^4.0.0"
+    "redux-axios-middleware": "^4.0.0",
+    "rn-fetch-blob": "^0.10.14"
   },
   "devDependencies": {
     "babel-jest": "23.6.0",

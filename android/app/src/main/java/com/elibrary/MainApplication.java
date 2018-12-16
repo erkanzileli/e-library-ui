@@ -3,12 +3,19 @@ package com.elibrary;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.yoloci.uploadfile.UploadFilePackage;
+import com.filepicker.FilePickerPackage;
+import com.rngrp.RNGRPPackage;
+import com.RNFetchBlob.RNFetchBlobPackage;
+import com.farmisen.react_native_file_uploader.RCTFileUploaderPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 
 import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
+import com.rnfs.RNFSPackage;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,7 +31,13 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativeDocumentPicker() // Add package
+            new UploadFilePackage(),
+            new FilePickerPackage(),
+            new RNGRPPackage(),
+            new RNFetchBlobPackage(),
+            new RCTFileUploaderPackage(),
+          new ReactNativeDocumentPicker(),
+          new RNFSPackage()
       );
     }
 

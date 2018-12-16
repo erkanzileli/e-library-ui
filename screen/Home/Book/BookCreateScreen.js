@@ -1,4 +1,5 @@
 import React from 'react'
+import { } from "react-native";
 import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container } from 'native-base';
 import { connect } from "react-redux";
 import apolloClient from '../../../utils/apolloClient';
@@ -8,6 +9,9 @@ import { CREATE_BOOK, ALL_AUTHORS_AND_CATEGORIES } from '../../../utils/gql';
 import { getUserName } from '../../../utils/authorization';
 import { addBook } from "../../../redux/actions";
 import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
+import { API_URL } from '../../../env/environment';
+var RNFS = require('react-native-fs');
+import RNFetchBlob from 'rn-fetch-blob'
 
 function validations(values) {
     let result = {
@@ -135,20 +139,98 @@ class BookCreateScreen extends React.Component {
         })
     }
 
+    uploadFile = async ({ uri, fileType, fileName, fileSize }) => {
+        // const data = new FormData();
+        // data.append('file',
+        //     {
+        //         uri: uri,
+        //         type: "multipart/form-data", 
+        //         name: fileName,
+        //     });
+        // // let xhr = new XMLHttpRequest()
+        // // xhr.open('POST', `${API_URL}/file/upload/21`)
+        // // xhr.send(data)
+        // fetch(`${API_URL}/file/upload/21`, {
+        //     body: data,
+        //     method: 'post',
+        //     headers: {
+        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ',
+        //         'Content-Type': 'multipart/form-data',
+        //     }
+        // })
+        // .then(r => console.warn(r))
+        // .catch(err => { console.warn(err) })
+        RNFetchBlob.config({
+            addAndroidDownloads: {
+                useDownloadManager: true, // <-- this is the only thing required
+                // Optional, override notification setting (default to true)
+                notification: true,
+                // Optional, but recommended since android DownloadManager will fail when
+                // the url does not contains a file extension, by default the mime type will be text/plain
+                mime: 'application/pdf',
+                description: 'File downloaded by download manager.'
+            }
+        }).fetch('GET', `${API_URL}/file/download/21-dummy.pdf`, {
+            'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ',
+        }).then((res) => {
+            let status = res.info().status;
+            console.warn('The file saved to ', res.path())
+
+            if (status == 200) {
+                // the conversion is done in native code
+                let base64Str = res.base64()
+                // the following conversions are done in js, it's SYNC
+                let text = res.text()
+                let json = res.json()
+            } else {
+                // handle other status codes
+            }
+        })
+            // Something went wrong:
+            .catch((errorMessage, statusCode) => {
+                // error handling
+            })
+        // fetch(`${API_URL}/file/download/21-dummy.pdf`, {
+        //     method: 'get',
+        //     headers: {
+        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ'
+        //     }
+        // })
+        // .then(r => console.warn(r))
+        // .catch(err => { console.warn(err) })
+    }
+
     handeFileChoose = () => {
+
         DocumentPicker.show({
             filetype: [DocumentPickerUtil.pdf()],
-          },(error,res) => {
-            // Android
-            console.warn(
-               res.uri,
-               res.type, // mime type
-               res.fileName,
-               res.fileSize
-            );
-          });
-      
+        }, (error, res) => {
+            this.uploadFile({ ...res })
+        })
 
+        // const data = new FormData();
+        // data.append('file', JSON.stringify({
+        // uri: res.fileUri,
+        // type: res.fileType,
+        // name: res.fileName,
+        // }));
+        // data.append('Authorization', 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG9ydWsiLCJyb2xlIjoidXNlciIsImV4cCI6MTU0NDk5MzYwNn0.JIP_8UyR1dZQ5OyUm0dz9algQCFfmyLK5HGR_9iu4h6PyltErKDU9G0A0rEjQ1ydmnrfJtnJu3fR3gD1ioQkRQ')
+        // let xhr = new XMLHttpRequest()
+        // xhr.open('POST', `${API_URL}/file/upload/21`)
+        // xhr.send(data)
+        // fetch(`${API_URL}/file/upload/21`, {
+        //     body: data,
+        //     method: 'post',
+        //     headers: {
+        //         'Accept':'application/json',
+        //         'Content-Type': 'multipart/form-data',
+        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG9ydWsiLCJyb2xlIjoidXNlciIsImV4cCI6MTU0NDk5MzYwNn0.JIP_8UyR1dZQ5OyUm0dz9algQCFfmyLK5HGR_9iu4h6PyltErKDU9G0A0rEjQ1ydmnrfJtnJu3fR3gD1ioQkRQ'
+        //     }
+        // }).then(r=>console.warn(r))
+        // .catch(err=>{
+        //     console.warn(err)
+        // })
+        // });
     }
 
     render() {
