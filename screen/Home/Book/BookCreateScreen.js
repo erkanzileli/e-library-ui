@@ -1,17 +1,16 @@
 import React from 'react'
 import { } from "react-native";
-import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container } from 'native-base';
+import { Item, Input, Label, Header, Left, Button, Icon, Title, Right, Toast, Body, View, Container, Text } from 'native-base';
 import { connect } from "react-redux";
+import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import apolloClient from '../../../utils/apolloClient';
 import Loader from '../../../component/Loader';
 import Dropdown from '../../../component/Dropdown';
 import { CREATE_BOOK, ALL_AUTHORS_AND_CATEGORIES } from '../../../utils/gql';
 import { getUserName } from '../../../utils/authorization';
 import { addBook } from "../../../redux/actions";
-import { DocumentPicker, DocumentPickerUtil } from 'react-native-document-picker';
 import { API_URL } from '../../../env/environment';
-var RNFS = require('react-native-fs');
-import RNFetchBlob from 'rn-fetch-blob'
+import { getToken } from '../../../storage';
 
 function validations(values) {
     let result = {
@@ -70,11 +69,11 @@ class BookCreateScreen extends React.Component {
             pageCount: null,
             authorId: null,
             categoryId: null,
-            userId: 1,
             authors: [],
             bookCategories: [],
             authorOptions: [],
             bookCategoryOptions: [],
+            file: null,
             validation: {
                 name: true,
                 title: true,
@@ -101,7 +100,7 @@ class BookCreateScreen extends React.Component {
         })
     }
 
-    handleSubmit = ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
+    handleSubmit = ({ name, title, description, pageCount, authorId, categoryId, file } = this.state) => {
         const validate = validations({ name, title, description, pageCount, authorId, categoryId })
         let valid = true
         Object.keys(validate).forEach(key => {
@@ -116,12 +115,20 @@ class BookCreateScreen extends React.Component {
                 duration: 3000,
                 type: 'danger'
             })
-        } else {
+        } else if (!file) {
+            Toast.show({
+                text: "Cihazınızdan kitabı seçmeyi unutmayın!",
+                buttonText: "Tamam",
+                duration: 3000,
+                type: 'warning'
+            })
+        }
+        else {
             this.submit()
         }
     }
 
-    submit = async ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
+    submit = async ({ name, title, description, pageCount, authorId, categoryId, file } = this.state) => {
         this.setState({ loading: true })
         const username = await getUserName()
         apolloClient.mutate({
@@ -133,108 +140,52 @@ class BookCreateScreen extends React.Component {
                 buttonText: "Okay",
                 duration: 3000
             })
-            this.props.addBook(response.data.createBook)
+            const book = response.data.createBook
+            this.props.addBook(book)
+            this.uploadFile(book.id, file.uri, file.fileName)
+            Toast.show({
+                text: "Kitap sisteme eklendi.",
+                buttonText: "Tamam",
+                duration: 3000,
+                type: 'success'
+            })
             this.setState({ loading: false })
-            this.props.navigation.navigate({ routeName: 'Home', params: { bookId: response.data.createBook.id } })
+            this.props.navigation.navigate('Home')
         })
     }
 
-    uploadFile = async ({ uri, fileType, fileName, fileSize }) => {
-        // const data = new FormData();
-        // data.append('file',
-        //     {
-        //         uri: uri,
-        //         type: "multipart/form-data", 
-        //         name: fileName,
-        //     });
-        // // let xhr = new XMLHttpRequest()
-        // // xhr.open('POST', `${API_URL}/file/upload/21`)
-        // // xhr.send(data)
-        // fetch(`${API_URL}/file/upload/21`, {
-        //     body: data,
-        //     method: 'post',
-        //     headers: {
-        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ',
-        //         'Content-Type': 'multipart/form-data',
-        //     }
-        // })
-        // .then(r => console.warn(r))
-        // .catch(err => { console.warn(err) })
-        RNFetchBlob.config({
-            addAndroidDownloads: {
-                useDownloadManager: true, // <-- this is the only thing required
-                // Optional, override notification setting (default to true)
-                notification: true,
-                // Optional, but recommended since android DownloadManager will fail when
-                // the url does not contains a file extension, by default the mime type will be text/plain
-                mime: 'application/pdf',
-                description: 'File downloaded by download manager.'
-            }
-        }).fetch('GET', `${API_URL}/file/download/21-dummy.pdf`, {
-            'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ',
-        }).then((res) => {
-            let status = res.info().status;
-            console.warn('The file saved to ', res.path())
-
-            if (status == 200) {
-                // the conversion is done in native code
-                let base64Str = res.base64()
-                // the following conversions are done in js, it's SYNC
-                let text = res.text()
-                let json = res.json()
-            } else {
-                // handle other status codes
+    uploadFile = async (bookId, uri, fileName) => {
+        const token = await getToken()
+        const data = new FormData();
+        data.append('file',
+            {
+                uri: uri,
+                type: "multipart/form-data",
+                name: fileName,
+            });
+        fetch(`${API_URL}/file/upload/${bookId}`, {
+            body: data,
+            method: 'post',
+            headers: {
+                'Authorization': token,
+                'Content-Type': 'multipart/form-data',
             }
         })
-            // Something went wrong:
-            .catch((errorMessage, statusCode) => {
-                // error handling
-            })
-        // fetch(`${API_URL}/file/download/21-dummy.pdf`, {
-        //     method: 'get',
-        //     headers: {
-        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiIsImV4cCI6MTU0NTQyNjY1Nn0.1jCjq8OQxL8gwmq4FiKSfBujolBf-CNxOHj3zzxY2yvEyWoAzmrus5i7sme4o9RxF1mjozjUNJ76im9CpZ-YDQ'
-        //     }
-        // })
-        // .then(r => console.warn(r))
-        // .catch(err => { console.warn(err) })
+            .catch(err => { console.warn(err) })
     }
 
     handeFileChoose = () => {
-
         DocumentPicker.show({
             filetype: [DocumentPickerUtil.pdf()],
         }, (error, res) => {
-            this.uploadFile({ ...res })
+            if (res) {
+                this.setState({ file: res })
+            }
         })
-
-        // const data = new FormData();
-        // data.append('file', JSON.stringify({
-        // uri: res.fileUri,
-        // type: res.fileType,
-        // name: res.fileName,
-        // }));
-        // data.append('Authorization', 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG9ydWsiLCJyb2xlIjoidXNlciIsImV4cCI6MTU0NDk5MzYwNn0.JIP_8UyR1dZQ5OyUm0dz9algQCFfmyLK5HGR_9iu4h6PyltErKDU9G0A0rEjQ1ydmnrfJtnJu3fR3gD1ioQkRQ')
-        // let xhr = new XMLHttpRequest()
-        // xhr.open('POST', `${API_URL}/file/upload/21`)
-        // xhr.send(data)
-        // fetch(`${API_URL}/file/upload/21`, {
-        //     body: data,
-        //     method: 'post',
-        //     headers: {
-        //         'Accept':'application/json',
-        //         'Content-Type': 'multipart/form-data',
-        //         'Authorization': 'JWT eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG9ydWsiLCJyb2xlIjoidXNlciIsImV4cCI6MTU0NDk5MzYwNn0.JIP_8UyR1dZQ5OyUm0dz9algQCFfmyLK5HGR_9iu4h6PyltErKDU9G0A0rEjQ1ydmnrfJtnJu3fR3gD1ioQkRQ'
-        //     }
-        // }).then(r=>console.warn(r))
-        // .catch(err=>{
-        //     console.warn(err)
-        // })
-        // });
     }
 
     render() {
-        const { name, title, description, pageCount, loading, authorOptions, authorId, categoryId, bookCategoryOptions } = this.state
+        const { name, title, description, pageCount, loading, authorOptions, authorId, categoryId, bookCategoryOptions, file } = this.state
         const { navigation } = this.props
         const validate = validations({ name, title, description })
         return <Container>
@@ -305,6 +256,16 @@ class BookCreateScreen extends React.Component {
                         options={authorOptions}
                         onChange={value => this.setState({ authorId: value })}
                     />
+                    <Item fixedLabel error={!validate.title}>
+                        <Label> {file ? `${file.fileName} dosyası seçildi` : 'Dosya seçin'} </Label>
+                        <Button onPress={this.handeFileChoose}>
+                            <Text>
+                                {
+                                    file ? 'Farklı dosya seç' : 'Dosya seç'
+                                }
+                            </Text>
+                        </Button>
+                    </Item>
                 </View>
             </View>
         </Container>

@@ -99,6 +99,7 @@ query book($id: Long!){
       status
       downloadCount
       likeCount
+      filePath
       author {
         id
         firstName
@@ -281,6 +282,7 @@ query books{
       status
       downloadCount
       likeCount
+      filePath
       author {
         id
         firstName

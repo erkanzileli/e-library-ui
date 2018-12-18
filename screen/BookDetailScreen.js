@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, Header, Left, Button, Icon, Body, Title, Right, Toast, Content, Card, CardItem, Grid, Row, Col, Container } from 'native-base';
 import { TouchableOpacity, Alert } from 'react-native';
 import StarRating from 'react-native-star-rating';
+import RNFetchBlob from 'rn-fetch-blob'
 import apolloClient from '../utils/apolloClient';
 import { connect } from "react-redux";
 import { GET_BOOK, DELETE_BOOK, GET_USER } from '../utils/gql';
@@ -9,6 +10,7 @@ import Loader from '../component/Loader';
 import { getUserRole, getUserName } from '../utils/authorization';
 import { getToken } from '../storage';
 import { deleteBook, setBook } from "../redux/actions";
+import { API_URL } from '../env/environment';
 
 const styles = {
     authorText: {
@@ -68,7 +70,7 @@ class BookDetailScreen extends React.Component {
                 'Bu kitabı silmek istiyor musunuz?',
                 [
                     {
-                        text: 'Sil', onPress: () => this.deleteBook(token)
+                        text: 'Sil', onPress: () => this.deleteBook(String(token).split(' ')[1])
                     },
                     {
                         text: 'İptal'
@@ -88,10 +90,6 @@ class BookDetailScreen extends React.Component {
         }
     }
 
-    updateBook = (username) => {
-
-    }
-
     handleUpdateBook = ({ book, user, navigation } = this.props) => {
         if ((book.user.username === user.username) || user.username === 'moderator') {
             navigation.navigate('BookEdit', { book })
@@ -103,8 +101,48 @@ class BookDetailScreen extends React.Component {
         }
     }
 
+    handleDownloadPress = async () => {
+        const book = this.props.book
+        Toast.show({
+            text: "İndiriliyor!",
+            buttonText: "Okay",
+            duration: 3000
+        })
+        const token = await getToken()
+        RNFetchBlob.config({
+            addAndroidDownloads: {
+                useDownloadManager: true, // <-- this is the only thing required
+                // Optional, override notification setting (default to true)
+                notification: true,
+                // Optional, but recommended since android DownloadManager will fail when
+                // the url does not contains a file extension, by default the mime type will be text/plain
+                mime: 'application/pdf',
+                description: 'Dosya indirme yöneticisi tarafından indirildi.'
+            }
+        }).fetch('GET', `${API_URL}/file/download/${book.filePath}`, {
+            'Authorization': token,
+        }).then((res) => {
+            let status = res.info().status;
+            if (status == 200) {
+                // // the conversion is done in native code
+                // let base64Str = res.base64()
+                // // the following conversions are done in js, it's SYNC
+                // let text = res.text()
+                // let json = res.json()
+                Toast.show({
+                    text: `${book.name} adlı kitap ${res.path()} konumuna indirildi`,
+                    buttonText: "Tamam",
+                    duration: 3000,
+                    type: 'success'
+                })
+            } else {
+                // handle other status codes
+            }
+        })
+    }
+
     render() {
-        const { navigation } = this.props
+        const { navigation, book } = this.props
         const { name, title, description, pageCount, downloadCount, likeCount, author, user } = this.props.book
         return <Container>
             <Loader loading={this.state.loading} />
@@ -126,12 +164,7 @@ class BookDetailScreen extends React.Component {
                         })}>
                         <Icon type='MaterialIcons' name='bookmark-border' />
                     </Button>
-                    <Button transparent onPress={() =>
-                        Toast.show({
-                            text: "İndiriliyor!",
-                            buttonText: "Okay",
-                            duration: 3000
-                        })}>
+                    <Button transparent onPress={this.handleDownloadPress}>
                         <Icon name='download' />
                     </Button>
                     <Button transparent onPress={() => this.handleDelete()}>

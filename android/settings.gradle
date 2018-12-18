@@ -1,17 +1,7 @@
 rootProject.name = 'elibrary'
-include ':react-native-upload-file'
-project(':react-native-upload-file').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-upload-file/android')
-include ':react-native-file-picker'
-project(':react-native-file-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-file-picker/android')
-include ':react-native-get-real-path'
-project(':react-native-get-real-path').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-get-real-path/android')
 include ':rn-fetch-blob'
 project(':rn-fetch-blob').projectDir = new File(rootProject.projectDir, '../node_modules/rn-fetch-blob/android')
-include ':react-native-file-uploader'
-project(':react-native-file-uploader').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-file-uploader/android')
 
 include ':app'
 include ':react-native-document-picker'
 project(':react-native-document-picker').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-document-picker/android')
-include ':react-native-fs'
-project(':react-native-fs').projectDir = new File(settingsDir, '../node_modules/react-native-fs/android')
