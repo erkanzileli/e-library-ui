@@ -10,6 +10,21 @@ query authors {
     }
   }
 `
+
+export const CREATE_AUTHOR = gql`
+mutation createAuthor($firstName: String!, $lastName: String!) {
+  createAuthor(firstName: $firstName, lastName: $lastName) {
+    id
+    firstName
+    lastName
+  }
+}`
+
+export const DELETE_AUTHOR = gql`
+mutation deleteAuthor($id: Long!){
+  deleteAuthor(id: $id)
+}`
+
 export const BOOK_CATEGORIES = gql`
 query bookCategories {
     bookCategories {
@@ -17,6 +32,20 @@ query bookCategories {
       name
     }
   }`
+
+export const CREATE_BOOK_CATEGORY = gql`
+mutation createBookCategory($name: String!) {
+  createBookCategory(name: $name) {
+    id
+    name
+  }
+}`
+
+export const DELETE_BOOK_CATEGORY = gql`
+mutation deleteBookCategory($id: Long!) {
+  deleteBookCategory(id: $id)
+}
+`
 
 export const UPDATE_USER = gql`
 mutation updateUser(
@@ -287,6 +316,10 @@ query books{
         id
         firstName
         lastName
+      }
+      category{
+        id
+        name
       }
     }
   }

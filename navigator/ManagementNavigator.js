@@ -1,5 +1,5 @@
 import { createStackNavigator } from 'react-navigation'
-import ManagementScreen from '../screen/ManagementScreen'
+import ManagementScreen from '../screen/Management/ManagementScreen';
 
 export default createStackNavigator(
   {

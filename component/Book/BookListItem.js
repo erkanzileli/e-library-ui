@@ -20,10 +20,8 @@ const styles = {
 export default function BookListItem(props) {
     const handleDownloadPress = async () => {
         const book = props.book
-        console.warn(book)
         Toast.show({
             text: "İndiriliyor!",
-            buttonText: "Okay",
             duration: 3000
         })
         const token = await getToken()
@@ -58,7 +56,7 @@ export default function BookListItem(props) {
             }
         })
     }
-    const { id, author, title, downloadCount, likeCount, name, saved } = props.book
+    const { id, author, title, downloadCount, likeCount, name, saved, category } = props.book
     return <Content style={{ flex: 1 }}>
         <Card>
             <CardItem header bordered>
@@ -81,7 +79,18 @@ export default function BookListItem(props) {
                     <Row>
                         <Col>
                             <Text style={styles.authorText}>
-                                {`${author.firstName} ${author.lastName}`}
+                                {
+                                    author ? `${author.firstName} ${author.lastName}` : 'Yazar bilgisi yok'
+                                }
+                            </Text>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <Text style={styles.authorText}>
+                                Kategori: {
+                                    category ? category.name : 'Konu bilgisi yok'
+                                }
                             </Text>
                         </Col>
                     </Row>

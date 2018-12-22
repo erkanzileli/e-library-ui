@@ -111,15 +111,13 @@ class BookCreateScreen extends React.Component {
         if (!valid) {
             Toast.show({
                 text: "Alanların doğruluğunu kontrol edin veya boş bırakmayın!",
-                buttonText: "Tamam",
-                duration: 3000,
+                duration: 1000,
                 type: 'danger'
             })
         } else if (!file) {
             Toast.show({
                 text: "Cihazınızdan kitabı seçmeyi unutmayın!",
-                buttonText: "Tamam",
-                duration: 3000,
+                duration: 1000,
                 type: 'warning'
             })
         }
@@ -137,7 +135,6 @@ class BookCreateScreen extends React.Component {
         }).then(response => {
             Toast.show({
                 text: "Kaydedildi!",
-                buttonText: "Okay",
                 duration: 3000
             })
             const book = response.data.createBook
@@ -145,8 +142,7 @@ class BookCreateScreen extends React.Component {
             this.uploadFile(book.id, file.uri, file.fileName)
             Toast.show({
                 text: "Kitap sisteme eklendi.",
-                buttonText: "Tamam",
-                duration: 3000,
+                duration: 1000,
                 type: 'success'
             })
             this.setState({ loading: false })
@@ -201,9 +197,6 @@ class BookCreateScreen extends React.Component {
                 <Right>
                     <Button transparent onPress={() => this.handleSubmit()}>
                         <Icon type='MaterialIcons' name='save' />
-                    </Button>
-                    <Button transparent onPress={() => this.handeFileChoose()}>
-                        <Icon type='MaterialIcons' name='upload' />
                     </Button>
                 </Right>
             </Header>

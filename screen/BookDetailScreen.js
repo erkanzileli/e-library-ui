@@ -53,7 +53,6 @@ class BookDetailScreen extends React.Component {
             this.setState({ loading: false })
             Toast.show({
                 text: "Silindi!",
-                buttonText: "Okay",
                 duration: 3000
             })
             this.props.navigation.navigate('Home')
@@ -105,7 +104,6 @@ class BookDetailScreen extends React.Component {
         const book = this.props.book
         Toast.show({
             text: "İndiriliyor!",
-            buttonText: "Okay",
             duration: 3000
         })
         const token = await getToken()
@@ -131,7 +129,6 @@ class BookDetailScreen extends React.Component {
                 // let json = res.json()
                 Toast.show({
                     text: `${book.name} adlı kitap ${res.path()} konumuna indirildi`,
-                    buttonText: "Tamam",
                     duration: 3000,
                     type: 'success'
                 })
@@ -142,8 +139,8 @@ class BookDetailScreen extends React.Component {
     }
 
     render() {
-        const { navigation, book } = this.props
-        const { name, title, description, pageCount, downloadCount, likeCount, author, user } = this.props.book
+        const { navigation } = this.props
+        const { name, title, description, pageCount, downloadCount, likeCount, author, user, category } = this.props.book
         return <Container>
             <Loader loading={this.state.loading} />
             <Header>
@@ -159,7 +156,6 @@ class BookDetailScreen extends React.Component {
                     <Button transparent onPress={() =>
                         Toast.show({
                             text: "Kaydedildi!",
-                            buttonText: "Okay",
                             duration: 3000
                         })}>
                         <Icon type='MaterialIcons' name='bookmark-border' />
@@ -184,7 +180,10 @@ class BookDetailScreen extends React.Component {
                                     <Row>
                                         <Col size={5}>
                                             <Text style={styles.authorText}>
-                                                {`${author.firstName} ${author.lastName}`}
+                                                {author ? `${author.firstName} ${author.lastName}` : 'Yazar bilgisi yok.'}
+                                            </Text>
+                                            <Text style={styles.authorText}>
+                                                {category ? category.name : 'Kategori bilgisi yok.'}
                                             </Text>
                                         </Col>
                                         <Col size={3}>

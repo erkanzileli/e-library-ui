@@ -9,15 +9,13 @@ const initialState = {
         pageCount: null,
         downloadCount: 0,
         likeCount: 0,
-        author: {
-            firstName: null,
-            lastName: null
-        },
+        author: null,
         user: {
             firstName: null,
             lastName: null,
             username: null
         },
+        category: null
     },
 
 }

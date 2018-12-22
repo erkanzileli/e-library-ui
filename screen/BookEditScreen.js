@@ -41,10 +41,10 @@ function validations(values) {
     if (!values.pageCount) {
         result.pageCount = false
     }
-    if (!values.authorId) {
+    if (values.authorId === 'none') {
         result.authorId = false
     }
-    if (!values.categoryId) {
+    if (values.categoryId === 'none') {
         result.categoryId = false
     }
     return result
@@ -71,8 +71,8 @@ class BookEditScreen extends React.Component {
                 categoryId: true
             },
             ...book,
-            authorId: book.author.id,
-            categoryId: book.category.id
+            authorId: book.author ? book.author.id : 'none',
+            categoryId: book.category ? book.category.id : 'none'
         }
     }
 
@@ -82,9 +82,22 @@ class BookEditScreen extends React.Component {
                 query: ALL_AUTHORS_AND_CATEGORIES,
                 fetchPolicy: 'no-cache'
             })
-        const authorOptions = authors.map(author => ({ value: author.id, label: `${author.firstName} ${author.lastName}` }))
-        const bookCategoryOptions = bookCategories.map(category => ({ value: category.id, label: category.name }))
-        this.setState({ authors, bookCategories, authorOptions, bookCategoryOptions })
+        const authorOptions = [
+            { value: 'none', label: 'Seçiniz' },
+            ...authors.map(author => ({ value: author.id, label: `${author.firstName} ${author.lastName}` }))
+        ]
+        const bookCategoryOptions = [
+            { value: 'none', label: 'Seçiniz' },
+            ...bookCategories.map(category => ({ value: category.id, label: category.name }))
+        ]
+        this.setState({
+            authors,
+            bookCategories,
+            authorOptions,
+            bookCategoryOptions,
+            authorId: this.state.authorId || authorOptions[0].value,
+            categoryId: this.state.categoryId || bookCategoryOptions[0].value
+        })
     }
 
     handleSubmit = ({ name, title, description, pageCount, authorId, categoryId } = this.state) => {
@@ -98,8 +111,7 @@ class BookEditScreen extends React.Component {
         if (!valid) {
             Toast.show({
                 text: "Alanların doğruluğunu kontrol edin veya boş bırakmayın!",
-                buttonText: "Tamam",
-                duration: 3000,
+                duration: 2000,
                 type: 'danger'
             })
         } else {
@@ -107,15 +119,15 @@ class BookEditScreen extends React.Component {
         }
     }
 
-    submit = async ({ id, name, title, description, pageCount, authorId, userId, categoryId } = this.state) => {
+    submit = async ({ id, name, title, description, pageCount, authorId, user, categoryId } = this.state) => {
         this.setState({ loading: true })
         apolloClient.mutate({
             mutation: UPDATE_BOOK,
             variables: {
                 id,
-                token: await getToken(),
+                token: String(await getToken()).replace('JWT ', ''),
                 authorId,
-                userId: this.props.user.id,
+                userId: user.id,
                 categoryId,
                 name,
                 title,
@@ -125,13 +137,13 @@ class BookEditScreen extends React.Component {
         }).then(response => {
             Toast.show({
                 text: "Kaydedildi!",
-                buttonText: "Okay",
-                duration: 3000
+                duration: 2000,
+                type: 'success'
             })
             this.props.setBook(response.data.updateBook)
             this.setState({ loading: false })
             this.props.navigation.navigate('BookDetail')
-        })
+        }).catch(err => console.warn(err))
     }
 
     render() {
@@ -141,8 +153,8 @@ class BookEditScreen extends React.Component {
             description,
             pageCount,
             loading,
-            author,
-            category,
+            authorId,
+            categoryId,
             authorOptions,
             bookCategoryOptions
         } = this.state
@@ -185,7 +197,7 @@ class BookEditScreen extends React.Component {
                         />
                     </Item>
                     <Dropdown
-                        value={category ? category.name : ''}
+                        value={categoryId}
                         label='Kategori'
                         options={bookCategoryOptions}
                         onChange={value => this.setState({ categoryId: value })}
@@ -208,7 +220,7 @@ class BookEditScreen extends React.Component {
                         />
                     </Item>
                     <Dropdown
-                        value={author ? `${author.firstName} ${author.lastName}` : ''}
+                        value={authorId}
                         label='Yazar'
                         options={authorOptions}
                         onChange={value => this.setState({ authorId: value })}
