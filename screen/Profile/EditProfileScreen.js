@@ -61,7 +61,6 @@ class EditProfileScreen extends React.Component {
         if (!valid) {
             Toast.show({
                 text: "Alanların doğruluğunu kontrol edin veya boş bırakmayın!",
-                buttonText: "Tamam",
                 duration: 3000,
                 type: 'danger'
             })
@@ -80,7 +79,6 @@ class EditProfileScreen extends React.Component {
         setLoading(false)
         Toast.show({
             text: "Kaydedildi!",
-            buttonText: "Okay",
             duration: 3000
         })
         navigation.goBack()

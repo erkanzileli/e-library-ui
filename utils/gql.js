@@ -243,6 +243,20 @@ mutation($username: String!){
   }
 }
 `
+export const CHANGE_USER_STATUS = gql`
+mutation($username: String!, $status: Boolean!){
+  changeUserStatus(username: $username, status: $status){
+    id
+    firstName
+    lastName
+    username
+    email
+    type
+    isRequested
+    status
+  }
+}
+`
 
 export const GET_USERS = gql`
 query users{

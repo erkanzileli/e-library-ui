@@ -6,6 +6,9 @@ import StarRating from 'react-native-star-rating';
 import RNFetchBlob from 'rn-fetch-blob';
 import { getToken } from '../../storage';
 import { API_URL } from '../../env/environment';
+import { connect } from "react-redux";
+import { setBooks } from "../../redux/actions";
+
 const styles = {
     authorText: {
         fontSize: 13,
@@ -17,7 +20,7 @@ const styles = {
     }
 }
 
-export default function BookListItem(props) {
+function BookListItem(props) {
     const handleDownloadPress = async () => {
         const book = props.book
         Toast.show({
@@ -47,7 +50,6 @@ export default function BookListItem(props) {
                 // let json = res.json()
                 Toast.show({
                     text: `${book.name} adlı kitap indirildi`,
-                    buttonText: "Tamam",
                     duration: 3000,
                     type: 'success'
                 })
@@ -122,3 +124,9 @@ export default function BookListItem(props) {
     </Content >
 }
 
+const mapStateToProps = state => {
+    const { bookReducer: { books } } = state
+    return { books }
+}
+
+export default connect(mapStateToProps, { setBooks })(BookListItem)

@@ -3,7 +3,7 @@ import { Text, Content, Toast, SwipeRow, Button, Icon, Grid, Row, Col } from 'na
 import { Alert, RefreshControl, ScrollView, TouchableOpacity } from 'react-native'
 import apolloClient from '../../utils/apolloClient';
 import { getUserName } from '../../utils/authorization';
-import { USER_TO_EDITOR, CHANGE_USER_TYPE, IGNORE_USER, GET_USERS } from '../../utils/gql';
+import { USER_TO_EDITOR, CHANGE_USER_TYPE, IGNORE_USER, GET_USERS, CHANGE_USER_STATUS } from '../../utils/gql';
 import Loader from '../../component/Loader';
 import Dropdown from '../../component/Dropdown';
 
@@ -21,8 +21,7 @@ const styles = {
         textAlignVertical: 'center',
         alignSelf: 'flex-start',
         paddingLeft: 15,
-        paddingTop: 15,
-        color: "#008080"
+        paddingTop: 15
     }
 }
 
@@ -89,7 +88,23 @@ class UsersTab extends React.Component {
             users[users.findIndex(user => user.username === username)] = ignoreUser
             Toast.show({
                 text: "Kullanıcı engellendi!",
-                buttonText: "Tamam",
+                duration: 3000
+            })
+            this.setState({ users, loading: false })
+        })
+    }
+
+    changeUserStatus = async (username, status) => {
+        // this.setState({ loading: true })
+        apolloClient.mutate({
+            mutation: CHANGE_USER_STATUS,
+            variables: { username, status: status === 1 ? false : true }
+        }).then(response => {
+            const { data: { changeUserStatus } } = response
+            let users = this.state.users
+            users[users.findIndex(user => user.username === username)] = changeUserStatus
+            Toast.show({
+                text: status === 1 ? "Kullanıcı engellendi!" : "Kullanıcı engeli kaldırıldı!",
                 duration: 3000
             })
             this.setState({ users, loading: false })
@@ -127,12 +142,12 @@ class UsersTab extends React.Component {
         )
     }
 
-    handleUserIgnore = username => {
+    handleUserChangeStatus = (username, status) => {
         Alert.alert(
-            'Bu kullanıcıyı engellemek istiyor musunuz?', '',
+            status === 1 ? 'Bu kullanıcıyı engellemek istiyor musunuz?' : 'Bu kullanıcının engellini kaldırmak istiyor musunuz?', '',
             [
                 {
-                    text: 'Evet', onPress: () => this.ignoreUser(username)
+                    text: 'Evet', onPress: () => this.changeUserStatus(username, status)
                 },
                 {
                     text: 'Hayır'
@@ -179,7 +194,7 @@ class UsersTab extends React.Component {
                                     <Row>
                                         <Col size={5}>
                                             <TouchableOpacity>
-                                                <Text style={styles.userCol}>
+                                                <Text style={{ ...styles.userCol, color: user.status === 1 ? "#008080" : 'red' }}>
                                                     {`${user.firstName} ${user.lastName}`}
                                                 </Text>
                                             </TouchableOpacity>
@@ -204,8 +219,8 @@ class UsersTab extends React.Component {
                                 </Grid>
                             }
                             left={
-                                <Button danger onPress={() => this.handleUserIgnore(user.username)}>
-                                    <Icon active name="trash" />
+                                <Button danger={user.status === 1} success={user.status === 0} onPress={() => this.handleUserChangeStatus(user.username, user.status)}>
+                                    <Icon active name={user.status === 1 ? 'trash' : 'arrow-up'} />
                                 </Button>
                             }
                         />

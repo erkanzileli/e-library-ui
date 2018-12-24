@@ -90,7 +90,7 @@ class BookDetailScreen extends React.Component {
     }
 
     handleUpdateBook = ({ book, user, navigation } = this.props) => {
-        if ((book.user.username === user.username) || user.username === 'moderator') {
+        if ((book.user.username === user.username) || user.type === 'moderator') {
             navigation.navigate('BookEdit', { book })
         } else {
             Alert.alert(
